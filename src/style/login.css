@@ -1,0 +1,106 @@
+.auth-main-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  /* justify-content: space-between; */
+}
+
+.left-side-auth {
+  width: 621px;
+  background: rgb(0, 82, 162);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.right-side-auth {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: calc(100% - 621px);
+  gap: 143px;
+}
+
+.right-side-auth-title {
+  color: rgb(4, 67, 130);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 38.67px;
+  letter-spacing: 0px;
+  text-align: center;
+}
+
+.auth-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 750px;
+}
+
+.auth-form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.right-side-auth-title-input {
+  color: rgb(102, 102, 102);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 32px;
+  letter-spacing: 0px;
+  text-align: left;
+}
+
+.right-side-auth-input {
+  border: none;
+  outline: none;
+  font-size: 24px;
+  padding: 10px 20px;
+  width: calc(751px - 40px);
+  height: calc(58px - 20px);
+  border-radius: 10px;
+  background: rgb(245, 245, 245);
+}
+
+.right-side-auth-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px 0;
+  border-radius: 10px;
+  background: rgb(0, 102, 203);
+  border: none;
+  cursor: pointer;
+
+  color: rgb(255, 255, 255);
+  font-family: "Andika";
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 32px;
+  letter-spacing: 0px;
+  text-align: center;
+  margin-top: calc(216px - 18px);
+}
+
+@media screen and (min-width: 768px) and (max-width: 1390px) {
+  .auth-main-container {
+    flex-direction: column;
+  }
+
+  .left-side-auth {
+    width: 100%;
+  }
+
+  .right-side-auth {
+    width: 100%;
+    gap: 40px;
+  }
+
+  .right-side-auth-button {
+    margin: 0;
+  }
+}
