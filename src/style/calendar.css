@@ -3,6 +3,7 @@
   display: flex;
   align-items: center;
   gap: 50px;
+  padding: 20px;
 }
 
 .btn-container {
@@ -24,17 +25,13 @@
 .calendar-page-content-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-right: 187px;
+  gap: 10px;
   align-self: flex-end;
 }
 
 .calendar-search-container {
   display: flex;
   align-items: center;
-  gap: 15px;
-  width: calc(241px - 14px);
-  padding: 12px 7px;
   box-sizing: border-box;
   border: 1px solid rgb(245, 245, 247);
   border-radius: 10px;
@@ -44,22 +41,6 @@
 .calendar-search-input {
   background: inherit;
   width: 100%;
-  border: none;
-  outline: none;
-}
-
-.calendar-select-sort {
-  display: flex;
-  border-radius: 10px;
-  background: rgb(245, 245, 247);
-  color: rgb(126, 126, 126);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 19px;
-  letter-spacing: -1%;
-  text-align: left;
-  height: 58.88px;
-  padding: 10px 9px;
   border: none;
   outline: none;
 }
@@ -85,23 +66,24 @@
 }
 
 .events-item img {
-  width: 50px;
+  width: 30px;
+  height: auto;
 }
 
 .events-item-image-container {
+  width: 7%;
+  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: max-content;
-  height: max-content;
   padding: 12px;
   background: white;
   border-radius: 10px;
 }
 
 .events-item-image-container img {
-  width: 74px;
-  height: 64.75px;
+  width: 50px;
+  height: auto;
 }
 
 .events-item-title {
@@ -162,7 +144,7 @@
   padding: 21px 61px;
   color: rgb(255, 255, 255);
 
-  font-size: 32px;
+  font-size: 20px;
   font-weight: 400;
   line-height: 25.78px;
   letter-spacing: 0px;
@@ -177,8 +159,8 @@
 
 .pagination-item {
   position: relative;
-  width: 38.95px;
-  height: 49px;
+  width: 60px;
+  height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -187,14 +169,11 @@
   border: 1px solid rgb(238, 238, 238);
   border-radius: 4px;
   background: rgb(245, 245, 245);
-
   color: rgb(64, 75, 82);
-  font-size: 12px;
+  font-size: 20px;
   font-weight: 500;
   line-height: 100%;
-  letter-spacing: -1%;
   text-align: left;
-
   cursor: pointer;
   transition: all 0.3s ease-in;
 }
@@ -383,7 +362,7 @@ p {
     width: calc(100% - 44px);
     margin: 30px 22px 0;
   }
-  
+
   .calendar-page-content {
     width: calc(100% - 115px);
   }
@@ -393,11 +372,13 @@ p {
     width: 100%;
     flex-wrap: wrap;
   }
+
   .events-item-title,
   .events-item-date-container,
   .events-item-button {
     font-size: 18px;
   }
+
   .events-item-button {
     padding: 20px 15px;
   }
@@ -406,6 +387,7 @@ p {
     flex-direction: column;
     gap: 15px;
   }
+
   .events-item {
     flex-direction: column;
     padding: 12px;

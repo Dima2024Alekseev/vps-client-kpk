@@ -44,11 +44,13 @@ const Header = () => {
                             </Link>
                         </li>
                     </div>
-                    <li className="nav-menu-item logout">
-                        <Link to="/login" className="link" title="Выйти">
-                            <img src={logout} alt="Logout" />
-                        </Link>
-                    </li>
+                    <div>
+                        <li className="nav-menu-item logout">
+                            <Link to="/login" className="link" title="Выйти">
+                                <img src={logout} alt="Logout" />
+                            </Link>
+                        </li>
+                    </div>
                 </ul>
             </nav>
         </header>

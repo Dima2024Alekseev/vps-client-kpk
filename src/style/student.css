@@ -1,5 +1,6 @@
 .student-page {
   display: flex;
+  padding: 20px;
 }
 
 .student-page-content {
@@ -12,10 +13,10 @@
 }
 
 .student-page-header {
-  width: auto;
-  padding: 29px 51px;
+  width: 85%;
+  padding: 30px 50px;
   display: flex;
-  gap: 58px;
+  gap: 20px;
   align-items: center;
   justify-content: space-between;
   border-radius: 43px;
@@ -332,7 +333,8 @@ tr:hover .action-buttons {
     padding: 55px 9px;
   }
 
-  .calendar-search-container, .select {
+  .calendar-search-container,
+  .select {
     width: calc(100% - 14px);
   }
 
