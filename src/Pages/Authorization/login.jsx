@@ -1,6 +1,6 @@
 import React from "react";
-import "../style/login.css";
-import logo_auth from "../img/logo-auth.svg";
+import "./login.css";
+import logo_auth from "../../img/logo-auth.svg";
 
 const Login = () => {
   return <>

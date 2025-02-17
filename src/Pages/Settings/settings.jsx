@@ -1,6 +1,6 @@
 import React from "react";
-import "../style/settings.css";
-import Header from "../Components/Header/Header";
+import "./settings.css";
+import Header from "../../Components/Header/Header";
 
 
 const Settings = () => {

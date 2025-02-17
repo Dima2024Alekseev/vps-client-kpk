@@ -1,14 +1,14 @@
 import React from "react";
-import "../style/calendar.css";
-import Header from "../Components/Header/Header";
-import search from "../img/search-icon.svg";
-import reshot from "../img/reshot-icon-student.svg";
-import clock from "../img/clock.svg";
-import edit from "../img/edit.svg";
-import delete_ from "../img/delete.svg";
-import concert from "../img/online_concert_interaction.svg";
-import events from "../img/calendar_event_star.svg";
-import china from "../img/china_flag_icon.svg";
+import "./calendar.css";
+import Header from "../../Components/Header/Header";
+import search from "../../img/search-icon.svg";
+import reshot from "../../img/reshot-icon-student.svg";
+import clock from "../../img/clock.svg";
+import edit from "../../img/edit.svg";
+import delete_ from "../../img/delete.svg";
+import concert from "../../img/online_concert_interaction.svg";
+import events from "../../img/calendar_event_star.svg";
+import china from "../../img/china_flag_icon.svg";
 
 const Calendar = () => {
     return <>

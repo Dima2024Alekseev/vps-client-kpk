@@ -1,13 +1,13 @@
 import React from "react";
-import "../style/student.css";
-import Header from "../Components/Header/Header";
-import studentPage from "../img/studentPage/profile-2user.svg";
-import headerItem from "../img/studentPage/profile-tick.svg";
-import save from "../img/studentPage/save.svg";
-import search from "../img/search-icon.svg";
-import chevronL from "../img/chevron-left.svg";
-import chevronR from "../img/chevron-right.svg";
-import filter from "../img/studentPage/filter.svg";
+import "./student.css";
+import Header from "../../Components/Header/Header";
+import studentPage from "../../img/studentPage/profile-2user.svg";
+import headerItem from "../../img/studentPage/profile-tick.svg";
+import save from "../../img/studentPage/save.svg";
+import search from "../../img/search-icon.svg";
+import chevronL from "../../img/chevron-left.svg";
+import chevronR from "../../img/chevron-right.svg";
+import filter from "../../img/studentPage/filter.svg";
 
 const Students = () => {
     return <>

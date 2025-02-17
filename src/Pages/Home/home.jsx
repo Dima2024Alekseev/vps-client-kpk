@@ -1,16 +1,16 @@
 import React from "react";
-import "../style/index.css";
-import Header from "../Components/Header/Header";
-import user from "../img/user.svg";
-import search from "../img/search-icon.svg";
-import reshot from "../img/reshot-icon-student.svg";
-import clock from "../img/clock.svg";
-import concert from "../img/online_concert_interaction.svg";
-import events from "../img/calendar_event_star.svg";
-import china from "../img/china_flag_icon.svg";
-import bell from "../img/bell-icon.svg";
-import user_icon from "../img/user-icon.svg";
-import chevron from "../img/chevron-down.svg";
+import "./index.css";
+import Header from "../../Components/Header/Header";
+import user from "../../img/user.svg";
+import search from "../../img/search-icon.svg";
+import reshot from "../../img/reshot-icon-student.svg";
+import clock from "../../img/clock.svg";
+import concert from "../../img/online_concert_interaction.svg";
+import events from "../../img/calendar_event_star.svg";
+import china from "../../img/china_flag_icon.svg";
+import bell from "../../img/bell-icon.svg";
+import user_icon from "../../img/user-icon.svg";
+import chevron from "../../img/chevron-down.svg";
 function Home() {
   return (
     <>

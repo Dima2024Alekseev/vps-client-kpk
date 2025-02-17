@@ -1,6 +1,6 @@
 import React from "react";
-import "../style/statistic.css";
-import Header from "../Components/Header/Header";
+import "./statistic.css";
+import Header from "../../Components/Header/Header";
 
 const Statistics = () => {
     return <>
