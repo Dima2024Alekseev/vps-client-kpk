@@ -2,9 +2,9 @@
   width: max-content;
 }
 
-.chart-container {
+/* .chart-container {
   width: max-content;
-}
+} */
 
 #activityChart {
   display: block !important;
