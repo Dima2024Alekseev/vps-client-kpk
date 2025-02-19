@@ -1,6 +1,6 @@
 import React from "react";
 import "./index.css";
-import {Helmet} from 'react-helmet';
+import { Helmet } from 'react-helmet';
 import { Link } from "react-router";
 import Header from "../../Components/Header/Header";
 import user from "../../img/user.svg";
@@ -18,17 +18,21 @@ import chevron from "../../img/chevron-down.svg";
 const Home = () => {
   return (
     <>
-    <Helmet>
-      <title>Главная страницы</title>
-    </Helmet>
+      <Helmet>
+        <title>Главная страницы</title>
+      </Helmet>
       <div className="home-page">
         <Header />
         <div className="home-page-content">
           <div className="home-page-content-left-side">
             <div className="user-profile">
               <div className="user-profile-left-side">
-                <p className="greeting-container">Привет, медвед!</p>
-                <p className="quote-container">Цитата</p>
+                <div>
+                  <h1 className="greeting-container">Привет, медвед!</h1>
+                </div>
+                <div>
+                  <p className="quote-container">Цитата</p>
+                </div>
               </div>
               <div className="user-profile-right-side">
                 <img src={user} alt="user" />
