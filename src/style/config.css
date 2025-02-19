@@ -27,21 +27,10 @@ body {
     width: 100% !important;
 }
 
-/* home styles */
-
-.home-page {
-    display: flex;
-    justify-content: space-between;
-    /* gap: 50px;
-  width: 100%; */
-}
-
 .home-page-content {
     width: calc(95% - 101px);
     display: flex;
     justify-content: space-between;
-    /* justify-content: space-between;
-  width: 100%; */
 }
 
 .home-page-content-left-side {
