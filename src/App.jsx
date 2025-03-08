@@ -6,11 +6,13 @@ import Students from "./Pages/Students/students";
 import Statistics from "./Pages/Statistics/statistics";
 import Settings from "./Pages/Settings/settings";
 import Login from "./Pages/Authorization/login";
+import ScrollToTop from "./Components/ScrollToTop"; // Импортируем компонент
 import "./style/config.css";
 
 const App = () => {
   return (
     <Router>
+      <ScrollToTop /> {/* Добавляем компонент здесь */}
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/calendar" element={<Calendar />} />
@@ -21,6 +23,6 @@ const App = () => {
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;

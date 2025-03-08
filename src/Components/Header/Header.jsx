@@ -7,11 +7,13 @@ import student from "../../img/student.svg";
 import statistics from "../../img/statistics.svg";
 import setting from "../../img/setting.svg";
 import logout from "../../img/logout.svg";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
+    const location = useLocation();
+
     return (
-        <header>
+        <header id="menu">
             <nav className="nav-menu">
                 <ul className="nav-menu-wrapper">
                     <li className="nav-menu-item">
@@ -19,27 +21,27 @@ const Header = () => {
                     </li>
                     <div className="nav-menu-items-container">
                         <li className="nav-menu-item">
-                            <Link to="/home" className="link" title="Главную страница">
+                            <Link to="/home" className={`link ${location.pathname === "/home" ? "active" : ""}`} title="Главную страницу">
                                 <img src={home} alt="Home" />
                             </Link>
                         </li>
                         <li className="nav-menu-item">
-                            <Link to="/calendar" className="link" title="Календарь">
+                            <Link to="/calendar" className={`link ${location.pathname === "/calendar" ? "active" : ""}`} title="Календарь">
                                 <img src={calendar} alt="Calendar" />
                             </Link>
                         </li>
                         <li className="nav-menu-item">
-                            <Link to="/students" className="link" title="Студенты">
+                            <Link to="/students" className={`link ${location.pathname === "/students" ? "active" : ""}`} title="Студенты">
                                 <img src={student} alt="Students" />
                             </Link>
                         </li>
                         <li className="nav-menu-item">
-                            <Link to="/statistics" className="link" title="Статистика">
+                            <Link to="/statistics" className={`link ${location.pathname === "/statistics" ? "active" : ""}`} title="Статистика">
                                 <img src={statistics} alt="Statistics" />
                             </Link>
                         </li>
                         <li className="nav-menu-item">
-                            <Link to="/settings" className="link" title="Настройки">
+                            <Link to="/settings" className={`link ${location.pathname === "/settings" ? "active" : ""}`} title="Настройки">
                                 <img src={setting} alt="Settings" />
                             </Link>
                         </li>
