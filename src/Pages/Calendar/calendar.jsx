@@ -94,7 +94,7 @@ const Calendar = () => {
     return (
         <>
             <Helmet>
-                <title>Мероприятия</title>
+                <title>Календарь</title>
             </Helmet>
             <div className="calendar-page">
                 <Header />
