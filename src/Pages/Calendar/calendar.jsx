@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Helmet } from "react-helmet";
 import "./calendar.css";
 import Header from "../../Components/Header/Header";
@@ -10,8 +10,87 @@ import delete_ from "../../img/delete.svg";
 import concert from "../../img/online_concert_interaction.svg";
 import events from "../../img/calendar_event_star.svg";
 import china from "../../img/china_flag_icon.svg";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const Calendar = () => {
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [viewModalOpen, setViewModalOpen] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+
+    const eventsData = [
+        {
+            id: 1,
+            title: "Второй Этап конкурса Студент года 2024",
+            date: "04.03.2024",
+            time: "14:00",
+            place: "Главный корпус, аудитория 101",
+            organizer: "Иванов И.И.",
+            image: reshot,
+        },
+        {
+            id: 2,
+            title: "Концерт ко Дню Защитника Отечества",
+            date: "22.02.2024",
+            time: "18:00",
+            place: "Актовый зал",
+            organizer: "Петров П.П.",
+            image: concert,
+        },
+        {
+            id: 3,
+            title: "Квиз в честь Дня студента",
+            date: "25.01.2024",
+            time: "15:00",
+            place: "КПК, актовый зал",
+            organizer: "Жукова Т.Д.",
+            image: events,
+        },
+        {
+            id: 4,
+            title: "Дни китайской культуры",
+            date: "15.12.2023",
+            time: "12:00",
+            place: "Конференц-зал",
+            organizer: "Сидоров С.С.",
+            image: china,
+        },
+        {
+            id: 5,
+            title: "Открытие шахматного клуба",
+            date: "08.12.2023",
+            time: "16:00",
+            place: "Библиотека",
+            organizer: "Кузнецов К.К.",
+            image: events,
+        },
+    ];
+
+    const handleEditClick = (event) => {
+        setSelectedEvent(event);
+        setEditModalOpen(true);
+    };
+
+    const handleDeleteClick = (event) => {
+        setSelectedEvent(event);
+        setDeleteModalOpen(true);
+    };
+
+    const handleViewClick = (event) => {
+        setSelectedEvent(event);
+        setViewModalOpen(true);
+    };
+
+    const handleSaveEdit = () => {
+        // Логика сохранения изменений
+        setEditModalOpen(false);
+    };
+
+    const handleConfirmDelete = () => {
+        // Логика удаления события
+        setDeleteModalOpen(false);
+    };
+
     return (
         <>
             <Helmet>
@@ -29,203 +108,153 @@ const Calendar = () => {
                         </div>
                         <select className="calendar-select-sort">
                             <option value="1">Сорт: Дата</option>
-                            <option value="1">Сорт: Название А-Я</option>
-                            <option value="1">Сорт: Название Я-А</option>
+                            <option value="2">Сорт: Название А-Я</option>
+                            <option value="3">Сорт: Название Я-А</option>
                         </select>
                     </div>
 
                     <div className="calendar-events-container">
-                        <div className="events-item">
-                            <div className="events-item-image-container">
-                                <img src={reshot} alt="" />
-                            </div>
-                            <div className="events-item-title">
-                                Второй Этап конкурса Студент года 2024
-                            </div>
-                            <div className="events-item-date-container">
-                                <div>
-                                    <img src={clock} alt="" />
+                        {eventsData.map((event) => (
+                            <div className="events-item" key={event.id}>
+                                <div className="events-item-image-container">
+                                    <img src={event.image} alt="" />
                                 </div>
-                                <div>04.03.2024</div>
-                            </div>
-                            <div className="btn-container">
-                                <div className="events-item-button">Подробнее</div>
-                                <img src={edit} alt="edit-icon" className="edit-button" />
-                                <img src={delete_} alt="delete-icon" />
-                            </div>
-                        </div>
-
-                        <div className="events-item">
-                            <div className="events-item-image-container">
-                                <img src={concert} alt="" />
-                            </div>
-                            <div className="events-item-title">
-                                Концерт ко Дню Защитника Отечества
-                            </div>
-                            <div className="events-item-date-container">
-                                <div>
-                                    <img src={clock} alt="" />
+                                <div className="events-item-title">{event.title}</div>
+                                <div className="events-item-date-container">
+                                    <div>
+                                        <img src={clock} alt="" />
+                                    </div>
+                                    <div>{event.date}</div>
                                 </div>
-                                <div>22.02.2024</div>
-                            </div>
-                            <div className="btn-container">
-                                <div className="events-item-button">Подробнее</div>
-                                <img src={edit} alt="edit-icon" className="edit-button" />
-                                <img src={delete_} alt="delete-icon" />
-                            </div>
-                        </div>
-
-                        <div className="events-item">
-                            <div className="events-item-image-container">
-                                <img src={events} alt="" />
-                            </div>
-                            <div className="events-item-title">Квиз в честь Дня студента</div>
-                            <div className="events-item-date-container">
-                                <div>
-                                    <img src={clock} alt="" />
+                                <div className="btn-container">
+                                    <div
+                                        className="events-item-button"
+                                        onClick={() => handleViewClick(event)}
+                                    >
+                                        Подробнее
+                                    </div>
+                                    <img
+                                        src={edit}
+                                        alt="edit-icon"
+                                        className="edit-button"
+                                        onClick={() => handleEditClick(event)}
+                                    />
+                                    <img
+                                        src={delete_}
+                                        alt="delete-icon"
+                                        onClick={() => handleDeleteClick(event)}
+                                    />
                                 </div>
-                                <div>25.01.2024</div>
                             </div>
-                            <div className="btn-container">
-                                <div className="events-item-button">Подробнее</div>
-                                <img src={edit} alt="edit-icon" className="edit-button" />
-                                <img src={delete_} alt="delete-icon" />
-                            </div>
-                        </div>
-
-                        <div className="events-item">
-                            <div className="events-item-image-container">
-                                <img src={china} alt="" />
-                            </div>
-                            <div className="events-item-title">Дни китайской культуры</div>
-                            <div className="events-item-date-container">
-                                <div>
-                                    <img src={clock} alt="" />
-                                </div>
-                                <div>15.12.2023</div>
-                            </div>
-                            <div className="btn-container">
-                                <div className="events-item-button">Подробнее</div>
-                                <img src={edit} alt="edit-icon" className="edit-button" />
-                                <img src={delete_} alt="delete-icon" />
-                            </div>
-                        </div>
-
-                        <div className="events-item">
-                            <div className="events-item-image-container">
-                                <img src={events} alt="" />
-                            </div>
-                            <div className="events-item-title">Открытие шахматного клуба</div>
-                            <div className="events-item-date-container">
-                                <div>
-                                    <img src={clock} alt="" />
-                                </div>
-                                <div>08.12.2023</div>
-                            </div>
-                            <div className="btn-container">
-                                <div className="events-item-button">Подробнее</div>
-                                <img src={edit} alt="edit-icon" className="edit-button" />
-                                <img src={delete_} alt="delete-icon" />
-                            </div>
-                        </div>
+                        ))}
                     </div>
 
-                    {/* модалка для редактирования информации */}
-                    <div id="modal" className="modal">
+                    {/* Модальное окно редактирования */}
+                    <div id="modal" className={`modal ${editModalOpen ? "active" : ""}`}>
                         <div className="modal-content">
-                            <span className="close"></span>
-                            <h2 id="modal-title">Заголовок модального окна</h2>
+                            <h2 id="modal-title">Редактирование мероприятия</h2>
                             <div className="form">
                                 <div className="name-event-container">
-                                    <label for="edit-title">Название меропрития</label>
-                                    <input type="text" id="edit-title" />
+                                    <label htmlFor="edit-title">Название мероприятия</label>
+                                    <input
+                                        type="text"
+                                        id="edit-title"
+                                        defaultValue={selectedEvent?.title}
+                                    />
                                 </div>
                                 <div className="inputs-container">
                                     <div className="name-event-container">
-                                        <label for="edit-date">Дата проведения</label>
-                                        <input type="text" id="edit-date" />
+                                        <label htmlFor="edit-date">Дата проведения</label>
+                                        <input
+                                            type="text"
+                                            id="edit-date"
+                                            defaultValue={selectedEvent?.date}
+                                        />
                                     </div>
                                     <div className="name-event-container">
-                                        <label for="edit-time">Время проведения</label>
-                                        <input type="text" id="edit-time" />
+                                        <label htmlFor="edit-time">Время проведения</label>
+                                        <input
+                                            type="text"
+                                            id="edit-time"
+                                            defaultValue={selectedEvent?.time}
+                                        />
                                     </div>
                                 </div>
                                 <div className="name-event-container">
-                                    <label for="edit-title">Место проведения</label>
-                                    <input type="text" id="edit-place" />
+                                    <label htmlFor="edit-place">Место проведения</label>
+                                    <input
+                                        type="text"
+                                        id="edit-place"
+                                        defaultValue={selectedEvent?.place}
+                                    />
                                 </div>
                                 <div className="name-event-container">
-                                    <label for="edit-title">Организатор мероприятия</label>
-                                    <input type="text" id="edit-org" />
+                                    <label htmlFor="edit-org">Организатор мероприятия</label>
+                                    <input
+                                        type="text"
+                                        id="edit-org"
+                                        defaultValue={selectedEvent?.organizer}
+                                    />
                                 </div>
                             </div>
-                            <button id="save-button">Сохранить</button>
+                            <div className="modal-buttons">
+                                <button id="save-button" onClick={handleSaveEdit}>
+                                    Сохранить
+                                </button>
+                                <button id="close-button" onClick={() => setEditModalOpen(false)}>
+                                    Закрыть
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Модалка для просмотра информации */}
-                    <div id="view-modal" className="modal">
+                    {/* Модальное окно удаления */}
+                    <div id="delete-modal" className={`modal ${deleteModalOpen ? "active" : ""}`}>
                         <div className="modal-content">
-                            <span className="close"></span>
+                            <h2 id="delete-modal-title">Удаление мероприятия</h2>
+                            <p>Вы уверены, что хотите удалить мероприятие <br/>"{selectedEvent?.title}"?</p>
+                            <div className="modal-buttons">
+                                <button id="confirm-delete-button" onClick={handleConfirmDelete}>
+                                    Удалить
+                                </button>
+                                <button id="cancel-delete-button" onClick={() => setDeleteModalOpen(false)}>
+                                    Отмена
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Модальное окно просмотра информации */}
+                    <div id="view-modal" className={`modal ${viewModalOpen ? "active" : ""}`}>
+                        <div className="modal-content">
                             <h2 id="view-modal-title">Информация о мероприятии</h2>
                             <div className="form">
                                 <div className="name-event-container">
                                     <label>Название мероприятия</label>
-                                    <p id="view-title"></p>
+                                    <p>{selectedEvent?.title}</p>
                                 </div>
                                 <div className="inputs-container">
                                     <div className="name-event-container">
                                         <label>Дата проведения</label>
-                                        <p id="view-date"></p>
+                                        <p>{selectedEvent?.date}</p>
                                     </div>
                                     <div className="name-event-container">
                                         <label>Время проведения</label>
-                                        <p id="view-time"></p>
+                                        <p>{selectedEvent?.time}</p>
                                     </div>
                                 </div>
                                 <div className="name-event-container">
                                     <label>Место проведения</label>
-                                    <p id="view-place"></p>
+                                    <p>{selectedEvent?.place}</p>
                                 </div>
                                 <div className="name-event-container">
                                     <label>Организатор мероприятия</label>
-                                    <p id="view-org"></p>
-                                </div>
-                                <button id="close-button">Закрыть</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* модалка для создания события */}
-                    <div id="create-modal" className="modal">
-                        <div className="modal-content">
-                            <span className="close" id="close-create-modal">&times;</span>
-                            <h2 className="modal-title">Добавить мероприятие</h2>
-                            <div className="form">
-                                <div className="name-event-container">
-                                    <label for="create-title">Название мероприятия</label>
-                                    <input type="text" id="create-title" />
-                                </div>
-                                <div className="inputs-container">
-                                    <div className="name-event-container">
-                                        <label for="create-date">Дата проведения</label>
-                                        <input type="date" id="create-date" />
-                                    </div>
-                                    <div className="name-event-container">
-                                        <label for="create-time">Время проведения</label>
-                                        <input type="time" id="create-time" />
-                                    </div>
-                                </div>
-                                <div className="name-event-container">
-                                    <label for="create-place">Место проведения</label>
-                                    <input type="text" id="create-place" />
-                                </div>
-                                <div className="name-event-container">
-                                    <label for="create-org">Организатор</label>
-                                    <input type="text" id="create-org" />
+                                    <p>{selectedEvent?.organizer}</p>
                                 </div>
                             </div>
-                            <button id="create-button">Создать</button>
+                            <button id="close-button" onClick={() => setViewModalOpen(false)}>
+                                Закрыть
+                            </button>
                         </div>
                     </div>
 
@@ -233,7 +262,7 @@ const Calendar = () => {
                         <div className="add-btn">Добавить</div>
                         <div className="pagination-container">
                             <div className="pagination-item">
-                                <img src="./img/chevron-left.svg" alt="" />
+                                <FaChevronLeft />
                             </div>
                             <div className="pagination-item active">1</div>
                             <div className="pagination-item">2</div>
@@ -242,7 +271,7 @@ const Calendar = () => {
                             <div className="pagination-item empty">...</div>
                             <div className="pagination-item">...</div>
                             <div className="pagination-item">
-                                <img src="./img/chevron-right.svg" alt="" />
+                                <FaChevronRight />
                             </div>
                         </div>
                     </div>

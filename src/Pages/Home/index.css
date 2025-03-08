@@ -2,8 +2,20 @@
   width: max-content;
 }
 
-/* .chart-container {
-  width: max-content;
+.chart-container {
+  width: 100%;
+  background: rgb(245, 245, 247);
+  border-radius: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+
+/* #activityChart {
+  display: block !important;
+  box-sizing: border-box !important;
+  height: 277px !important;
+  width: 100% !important;
 } */
 
 #activityChart {

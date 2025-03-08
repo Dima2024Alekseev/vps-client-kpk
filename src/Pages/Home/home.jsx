@@ -13,13 +13,20 @@ import china from "../../img/china_flag_icon.svg";
 import bell from "../../img/bell-icon.svg";
 import user_icon from "../../img/user-icon.svg";
 import chevron from "../../img/chevron-down.svg";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
+const data = [
+  { name: 'ИСиП', 'Статистика активности': 8 },
+  { name: 'Нач. кл.', 'Статистика активности': 6 },
+  { name: 'Дошкол.', 'Статистика активности': 4 },
+  { name: 'Физ. кул.', 'Статистика активности': 2 },
+];
 
 const Home = () => {
   return (
     <>
       <Helmet>
-        <title>Главная страницы</title>
+        <title>Главная страница</title>
       </Helmet>
       <div className="home-page">
         <Header />
@@ -42,7 +49,6 @@ const Home = () => {
             <div className="events-container">
               <div className="events-container-header">
                 <div className="events-container-title">Мероприятия</div>
-
                 <div className="events-tabs-container">
                   <div className="events-tab active">Все</div>
                   <div className="events-tab">Фильтры</div>
@@ -139,7 +145,7 @@ const Home = () => {
               <div className="home-page-card">
                 <div className="home-page-card-number">4</div>
                 <div className="home-page-card-title">
-                  меропрития будет в этом месяце
+                  мероприятия будет в этом месяце
                 </div>
               </div>
               <div className="home-page-card">
@@ -153,19 +159,32 @@ const Home = () => {
               <div className="title">Статистика активности отделений</div>
               <select>
                 <option value="option 1">Сорт</option>
-                <option value="option 1">Сорт 2</option>
-                <option value="option 1">Сорт 3</option>
+                <option value="option 2">Сорт 2</option>
+                <option value="option 3">Сорт 3</option>
               </select>
               <div className="chart-container">
-                <canvas id="activityChart"></canvas>
+                <BarChart
+                  width={500}
+                  height={400}
+                  data={data}
+                  margin={{
+                    top: 10, right: -20, left: -20, bottom: 10,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="15 0" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Статистика активности" fill="#1E3A8A" barSize={60} />
+                </BarChart>
               </div>
             </div>
           </div>
         </div>
       </div>
     </>
-
   );
 }
 
-export default Home
+export default Home;

@@ -19,7 +19,7 @@ const Header = () => {
                     </li>
                     <div className="nav-menu-items-container">
                         <li className="nav-menu-item">
-                            <Link to="/" className="link" title="Главную страница">
+                            <Link to="/home" className="link" title="Главную страница">
                                 <img src={home} alt="Home" />
                             </Link>
                         </li>
