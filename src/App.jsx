@@ -6,20 +6,43 @@ import Students from "./Pages/Students/students";
 import Statistics from "./Pages/Statistics/statistics";
 import Settings from "./Pages/Settings/settings";
 import Login from "./Pages/Authorization/login";
-import ScrollToTop from "./Components/ScrollToTop"; // Импортируем компонент
+import ScrollToTop from "./Components/ScrollToTop";
+import ProtectedRoute from "./Components/ProtectedRoute";
 import "./style/config.css";
 
 const App = () => {
   return (
     <Router>
-      <ScrollToTop /> {/* Добавляем компонент здесь */}
+      <ScrollToTop />
       <Routes>
-        <Route path="/home" element={<Home />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/students" element={<Students />} />
-        <Route path="/statistics" element={<Statistics />} />
-        <Route path="/settings" element={<Settings />} />
+        {/* Общедоступные маршруты */}
         <Route path="/login" element={<Login />} />
+
+        {/* Защищенные маршруты */}
+        <Route
+          path="/home"
+          element={<Home />}
+        />
+        <Route
+          path="/calendar"
+          element={<Calendar />}
+        />
+        <Route
+          path="/students"
+          element={<Students />}
+        />
+        <Route
+          path="/statistics"
+          element={<Statistics />}
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute isAdmin> {/* Только для администратора */}
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
