@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Helmet } from "react-helmet";
+import { toast } from "react-toastify"; // Импортируем toast
+import { useNavigate } from "react-router-dom"; // Импортируем useNavigate
 import "./login.css";
 import logo_auth from "../../img/logo-auth.svg";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate(); // Хук для навигации
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,13 +26,17 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem("token", data.token); // Сохраняем токен
         localStorage.setItem("user", JSON.stringify(data.user)); // Сохраняем данные пользователя
-        alert("Авторизация успешна!");
-        window.location.href = "/home"; // Перенаправление на главную страницу
+        toast.success("Авторизация успешна!"); // Уведомление об успехе
+
+        // Переход на главную страницу через 1 секунду (чтобы уведомление успело показаться)
+        setTimeout(() => {
+          navigate("/home"); // Программный переход на главную страницу
+        }, 1000);
       } else {
-        alert(data.error || "Ошибка при авторизации");
+        toast.error(data.error || "Ошибка при авторизации"); // Уведомление об ошибке
       }
     } catch (error) {
-      alert("Ошибка при авторизации");
+      toast.error("Ошибка при авторизации"); // Уведомление об ошибке
     }
   };
 

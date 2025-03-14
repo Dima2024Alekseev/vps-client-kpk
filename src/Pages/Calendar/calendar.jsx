@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import "./calendar.css";
 import Header from "../../Components/Header/Header";
@@ -17,54 +17,30 @@ const Calendar = () => {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [viewModalOpen, setViewModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [eventsData, setEventsData] = useState([]);
 
-    const eventsData = [
-        {
-            id: 1,
-            title: "Второй Этап конкурса Студент года 2024",
-            date: "04.03.2024",
-            time: "14:00",
-            place: "Главный корпус, аудитория 101",
-            organizer: "Иванов И.И.",
-            image: reshot,
-        },
-        {
-            id: 2,
-            title: "Концерт ко Дню Защитника Отечества",
-            date: "22.02.2024",
-            time: "18:00",
-            place: "Актовый зал",
-            organizer: "Петров П.П.",
-            image: concert,
-        },
-        {
-            id: 3,
-            title: "Квиз в честь Дня студента",
-            date: "25.01.2024",
-            time: "15:00",
-            place: "КПК, актовый зал",
-            organizer: "Жукова Т.Д.",
-            image: events,
-        },
-        {
-            id: 4,
-            title: "Дни китайской культуры",
-            date: "15.12.2023",
-            time: "12:00",
-            place: "Конференц-зал",
-            organizer: "Сидоров С.С.",
-            image: china,
-        },
-        {
-            id: 5,
-            title: "Открытие шахматного клуба",
-            date: "08.12.2023",
-            time: "16:00",
-            place: "Библиотека",
-            organizer: "Кузнецов К.К.",
-            image: events,
-        },
-    ];
+    // Получение мероприятий из базы данных
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/events");
+                const data = await response.json();
+                setEventsData(data);
+            } catch (error) {
+                console.error("Ошибка при получении мероприятий:", error);
+            }
+        };
+
+        fetchEvents();
+    }, []);
+
+    // Маппинг изображений
+    const eventImages = {
+        "reshot-icon-student.svg": reshot,
+        "online_concert_interaction.svg": concert,
+        "calendar_event_star.svg": events,
+        "china_flag_icon.svg": china,
+    };
 
     const handleEditClick = (event) => {
         setSelectedEvent(event);
@@ -81,14 +57,45 @@ const Calendar = () => {
         setViewModalOpen(true);
     };
 
-    const handleSaveEdit = () => {
-        // Логика сохранения изменений
-        setEditModalOpen(false);
+    const handleSaveEdit = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/events/${selectedEvent._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(selectedEvent),
+            });
+
+            if (response.ok) {
+                const updatedEvent = await response.json();
+                setEventsData((prevEvents) =>
+                    prevEvents.map((event) =>
+                        event._id === updatedEvent._id ? updatedEvent : event
+                    )
+                );
+                setEditModalOpen(false);
+            }
+        } catch (error) {
+            console.error("Ошибка при обновлении мероприятия:", error);
+        }
     };
 
-    const handleConfirmDelete = () => {
-        // Логика удаления события
-        setDeleteModalOpen(false);
+    const handleConfirmDelete = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/events/${selectedEvent._id}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                setEventsData((prevEvents) =>
+                    prevEvents.filter((event) => event._id !== selectedEvent._id)
+                );
+                setDeleteModalOpen(false);
+            }
+        } catch (error) {
+            console.error("Ошибка при удалении мероприятия:", error);
+        }
     };
 
     return (
@@ -115,9 +122,9 @@ const Calendar = () => {
 
                     <div className="calendar-events-container">
                         {eventsData.map((event) => (
-                            <div className="events-item" key={event.id}>
+                            <div className="events-item" key={event._id}>
                                 <div className="events-item-image-container">
-                                    <img src={event.image} alt="" />
+                                    <img src={eventImages[event.image]} alt="" />
                                 </div>
                                 <div className="events-item-title">{event.title}</div>
                                 <div className="events-item-date-container">
@@ -160,6 +167,9 @@ const Calendar = () => {
                                         type="text"
                                         id="edit-title"
                                         defaultValue={selectedEvent?.title}
+                                        onChange={(e) =>
+                                            setSelectedEvent({ ...selectedEvent, title: e.target.value })
+                                        }
                                     />
                                 </div>
                                 <div className="inputs-container">
@@ -169,6 +179,9 @@ const Calendar = () => {
                                             type="text"
                                             id="edit-date"
                                             defaultValue={selectedEvent?.date}
+                                            onChange={(e) =>
+                                                setSelectedEvent({ ...selectedEvent, date: e.target.value })
+                                            }
                                         />
                                     </div>
                                     <div className="name-event-container">
@@ -177,6 +190,9 @@ const Calendar = () => {
                                             type="text"
                                             id="edit-time"
                                             defaultValue={selectedEvent?.time}
+                                            onChange={(e) =>
+                                                setSelectedEvent({ ...selectedEvent, time: e.target.value })
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -186,6 +202,9 @@ const Calendar = () => {
                                         type="text"
                                         id="edit-place"
                                         defaultValue={selectedEvent?.place}
+                                        onChange={(e) =>
+                                            setSelectedEvent({ ...selectedEvent, place: e.target.value })
+                                        }
                                     />
                                 </div>
                                 <div className="name-event-container">
@@ -194,6 +213,9 @@ const Calendar = () => {
                                         type="text"
                                         id="edit-org"
                                         defaultValue={selectedEvent?.organizer}
+                                        onChange={(e) =>
+                                            setSelectedEvent({ ...selectedEvent, organizer: e.target.value })
+                                        }
                                     />
                                 </div>
                             </div>
@@ -212,7 +234,7 @@ const Calendar = () => {
                     <div id="delete-modal" className={`modal ${deleteModalOpen ? "active" : ""}`}>
                         <div className="modal-content">
                             <h2 id="delete-modal-title">Удаление мероприятия</h2>
-                            <p>Вы уверены, что хотите удалить мероприятие <br/>"{selectedEvent?.title}"?</p>
+                            <p>Вы уверены, что хотите удалить мероприятие <br />"{selectedEvent?.title}"?</p>
                             <div className="modal-buttons">
                                 <button id="confirm-delete-button" onClick={handleConfirmDelete}>
                                     Удалить
