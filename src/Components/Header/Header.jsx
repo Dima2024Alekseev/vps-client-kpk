@@ -7,10 +7,31 @@ import student from "../../img/student.svg";
 import statistics from "../../img/statistics.svg";
 import setting from "../../img/setting.svg";
 import logout from "../../img/logout.svg";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Добавляем useNavigate
 
 const Header = () => {
     const location = useLocation();
+    const navigate = useNavigate(); // Хук для навигации
+
+    // Функция для выхода из учетной записи
+    const handleLogout = () => {
+        const userData = localStorage.getItem("user");
+
+        if (userData) {
+            // Если пользователь авторизован, показываем диалоговое окно с подтверждением
+            const confirmLogout = window.confirm("Вы точно хотите выйти?");
+            if (confirmLogout) {
+                // Удаляем данные из localStorage
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                navigate("/home"); // Перенаправляем на страницу /home
+                window.location.reload(); // Обновляем страницу
+            }
+        } else {
+            // Если пользователь не авторизован, перенаправляем на страницу авторизации
+            navigate("/login");
+        }
+    };
 
     return (
         <header id="menu">
@@ -48,15 +69,20 @@ const Header = () => {
                     </div>
                     <div>
                         <li className="nav-menu-item logout">
-                            <Link to="/login" className="link" title="Выйти">
+                            <div
+                                className="link"
+                                onClick={handleLogout} // Обработчик для выхода
+                                title="Выйти"
+                                style={{ cursor: "pointer" }} // Добавляем курсор для интерактивности
+                            >
                                 <img src={logout} alt="Logout" />
-                            </Link>
+                            </div>
                         </li>
                     </div>
                 </ul>
             </nav>
         </header>
     );
-}
+};
 
 export default Header;

@@ -275,7 +275,7 @@ p {
   outline: none;
   border-radius: 10px;
   background: rgb(245, 245, 245);
-  padding: 12px 19px;
+  /* padding: 12px 19px; */
   width: calc(100% - 38px);
   color: rgb(18, 113, 206);
   font-size: 20px;

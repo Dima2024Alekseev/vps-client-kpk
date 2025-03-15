@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import { Helmet } from "react-helmet";
 import "./index.css";
 import Header from "../../Components/Header/Header";
@@ -18,8 +18,12 @@ import ViewModal from "../../Components/Calendar/ViewModal";
 
 const Home = () => {
   const { eventsData } = useContext(EventsContext);
-  const [viewModalOpen, setViewModalOpen] = useState(false); // Состояние для открытия/закрытия модального окна
-  const [selectedEvent, setSelectedEvent] = useState(null); // Состояние для хранения выбранного мероприятия
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [upcomingEventsCount, setUpcomingEventsCount] = useState(0); // Количество будущих мероприятий
+  const [pastEventsCount, setPastEventsCount] = useState(0); // Количество прошедших мероприятий
+  const [currentUser, setCurrentUser] = useState(null); // Состояние для хранения текущего пользователя
+  const [dailyQuote, setDailyQuote] = useState("Загрузка цитаты..."); // Цитата дня
 
   const eventImages = {
     "reshot-icon-student.svg": reshot,
@@ -28,11 +32,71 @@ const Home = () => {
     "china_flag_icon.svg": china,
   };
 
+  // Получаем данные пользователя из localStorage при загрузке компонента
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setCurrentUser(JSON.parse(userData));
+    }
+  }, []);
+
   // Функция для открытия модального окна
   const handleViewClick = (event) => {
     setSelectedEvent(event);
     setViewModalOpen(true);
   };
+
+  // Мемоизированная функция для подсчета мероприятий
+  const countEvents = useCallback(() => {
+    const now = new Date(); // Текущая дата
+    const currentMonth = now.getMonth(); // Текущий месяц (0-11)
+    const currentYear = now.getFullYear(); // Текущий год
+
+    // Фильтруем мероприятия текущего месяца
+    const eventsThisMonth = eventsData.filter((event) => {
+      const eventDate = new Date(event.date);
+      return (
+        eventDate.getMonth() === currentMonth &&
+        eventDate.getFullYear() === currentYear
+      );
+    });
+
+    // Разделяем на будущие и прошедшие
+    const upcomingEvents = eventsThisMonth.filter(
+      (event) => new Date(event.date) > now
+    );
+    const pastEvents = eventsThisMonth.filter(
+      (event) => new Date(event.date) <= now
+    );
+
+    // Устанавливаем количество
+    setUpcomingEventsCount(upcomingEvents.length);
+    setPastEventsCount(pastEvents.length);
+  }, [eventsData]);
+
+  // Вызываем функцию подсчета при изменении eventsData
+  useEffect(() => {
+    countEvents();
+  }, [countEvents]);
+
+  // Запрос к API для получения цитаты дня
+  useEffect(() => {
+    const fetchDailyQuote = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/quotes/daily-quote");
+        if (!response.ok) {
+          throw new Error("Ошибка при загрузке цитаты");
+        }
+        const data = await response.json();
+        setDailyQuote({ text: data.text, author: data.author }); // Разделяем текст и автора
+      } catch (error) {
+        console.error("Ошибка:", error);
+        setDailyQuote({ text: "Не удалось загрузить цитату", author: "" });
+      }
+    };
+  
+    fetchDailyQuote();
+  }, []);
 
   return (
     <>
@@ -46,10 +110,13 @@ const Home = () => {
             <div className="user-profile">
               <div className="user-profile-left-side">
                 <div>
-                  <h1 className="greeting-container">Привет, медвед!</h1>
+                  <h1 className="greeting-container">
+                    Привет, {currentUser ? currentUser.username : "медвед"}!
+                  </h1>
                 </div>
-                <div>
-                  <p className="quote-container">Цитата</p>
+                <div className="quote-container">
+                  <p className="quote-text">{dailyQuote.text}</p>
+                  <p className="quote-author">{dailyQuote.author}</p>
                 </div>
               </div>
               <div className="user-profile-right-side">
@@ -80,7 +147,7 @@ const Home = () => {
                     </div>
                     <div
                       className="events-item-button"
-                      onClick={() => handleViewClick(event)} // Обработчик для открытия модального окна
+                      onClick={() => handleViewClick(event)}
                     >
                       Подробнее
                     </div>
@@ -105,13 +172,13 @@ const Home = () => {
             </div>
             <div className="home-page-cards-container">
               <div className="home-page-card">
-                <div className="home-page-card-number">4</div>
+                <div className="home-page-card-number">{upcomingEventsCount}</div>
                 <div className="home-page-card-title">
                   мероприятия будет в этом месяце
                 </div>
               </div>
               <div className="home-page-card">
-                <div className="home-page-card-number">4</div>
+                <div className="home-page-card-number">{pastEventsCount}</div>
                 <div className="home-page-card-title">
                   мероприятия прошло в этом месяце
                 </div>
