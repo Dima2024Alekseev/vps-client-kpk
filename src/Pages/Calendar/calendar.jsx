@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { Helmet } from "react-helmet";
 import "./calendar.css";
 import Header from "../../Components/Header/Header";
@@ -10,15 +10,20 @@ import delete_ from "../../img/delete.svg";
 import concert from "../../img/online_concert_interaction.svg";
 import events from "../../img/calendar_event_star.svg";
 import china from "../../img/china_flag_icon.svg";
-import Pagination from "../../Components/Pagination"; // Импортируем компонент Pagination
+import Pagination from "../../Components/Pagination";
+import { EventsContext } from "../../Components/EventsContext";
+import EditModal from "../../Components/Calendar/EditModal";
+import DeleteModal from "../../Components/Calendar/DeleteModal";
+import ViewModal from "../../Components/Calendar/ViewModal";
+import AddModal from "../../Components/Calendar/AddModal";
 
 const Calendar = () => {
+    const { eventsData, fetchEvents } = useContext(EventsContext);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [viewModalOpen, setViewModalOpen] = useState(false);
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
-    const [eventsData, setEventsData] = useState([]);
     const [newEvent, setNewEvent] = useState({
         title: "",
         date: "",
@@ -27,27 +32,11 @@ const Calendar = () => {
         organizer: "",
         image: "",
     });
-    const [currentPage, setCurrentPage] = useState(1); // Текущая страница
-    const eventsPerPage = 5; // Количество мероприятий на странице
-    const [searchQuery, setSearchQuery] = useState(""); // Состояние для поискового запроса
-    const [sortType, setSortType] = useState("date"); // Состояние для типа сортировки
+    const [currentPage, setCurrentPage] = useState(1);
+    const eventsPerPage = 5;
+    const [searchQuery, setSearchQuery] = useState("");
+    const [sortType, setSortType] = useState("date");
 
-    // Получение мероприятий из базы данных
-    useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                const response = await fetch("http://localhost:5000/api/events");
-                const data = await response.json();
-                setEventsData(data);
-            } catch (error) {
-                console.error("Ошибка при получении мероприятий:", error);
-            }
-        };
-
-        fetchEvents();
-    }, []);
-
-    // Маппинг изображений
     const eventImages = {
         "reshot-icon-student.svg": reshot,
         "online_concert_interaction.svg": concert,
@@ -55,12 +44,10 @@ const Calendar = () => {
         "china_flag_icon.svg": china,
     };
 
-    // Фильтрация мероприятий по поисковому запросу
     const filteredEvents = eventsData.filter((event) =>
         event.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // Сортировка мероприятий
     const sortedEvents = [...filteredEvents].sort((a, b) => {
         if (sortType === "date") {
             return new Date(a.date) - new Date(b.date);
@@ -72,23 +59,11 @@ const Calendar = () => {
         return 0;
     });
 
-    // Логика для отображения мероприятий на текущей странице
     const indexOfLastEvent = currentPage * eventsPerPage;
     const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
     const currentEvents = sortedEvents.slice(indexOfFirstEvent, indexOfLastEvent);
 
-    // Функция для изменения страницы
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    // Обработчик для закрытия модального окна при клике вне его области
-    const handleModalClick = (e) => {
-        if (e.target === e.currentTarget) {
-            setEditModalOpen(false);
-            setDeleteModalOpen(false);
-            setViewModalOpen(false);
-            setAddModalOpen(false);
-        }
-    };
 
     const handleEditClick = (event) => {
         setSelectedEvent(event);
@@ -120,12 +95,7 @@ const Calendar = () => {
             });
 
             if (response.ok) {
-                const updatedEvent = await response.json();
-                setEventsData((prevEvents) =>
-                    prevEvents.map((event) =>
-                        event._id === updatedEvent._id ? updatedEvent : event
-                    )
-                );
+                fetchEvents();
                 setEditModalOpen(false);
             }
         } catch (error) {
@@ -140,9 +110,7 @@ const Calendar = () => {
             });
 
             if (response.ok) {
-                setEventsData((prevEvents) =>
-                    prevEvents.filter((event) => event._id !== selectedEvent._id)
-                );
+                fetchEvents();
                 setDeleteModalOpen(false);
             }
         } catch (error) {
@@ -161,8 +129,7 @@ const Calendar = () => {
             });
 
             if (response.ok) {
-                const addedEvent = await response.json();
-                setEventsData((prevEvents) => [...prevEvents, addedEvent]);
+                fetchEvents();
                 setAddModalOpen(false);
                 setNewEvent({
                     title: "",
@@ -180,12 +147,12 @@ const Calendar = () => {
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
-        setCurrentPage(1); // Сброс страницы при изменении поискового запроса
+        setCurrentPage(1);
     };
 
     const handleSortChange = (e) => {
         setSortType(e.target.value);
-        setCurrentPage(1); // Сброс страницы при изменении сортировки
+        setCurrentPage(1);
     };
 
     return (
@@ -252,244 +219,37 @@ const Calendar = () => {
                         ))}
                     </div>
 
-                    {/* Модальное окно редактирования */}
-                    <div id="modal" className={`modal ${editModalOpen ? "active" : ""}`} onClick={handleModalClick}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <h2 id="modal-title">Редактирование мероприятия</h2>
-                            <div className="form">
-                                <div className="name-event-container">
-                                    <label htmlFor="edit-title">Название мероприятия</label>
-                                    <input
-                                        type="text"
-                                        id="edit-title"
-                                        value={selectedEvent?.title || ""}
-                                        onChange={(e) =>
-                                            setSelectedEvent({ ...selectedEvent, title: e.target.value })
-                                        }
-                                    />
-                                </div>
-                                <div className="inputs-container">
-                                    <div className="name-event-container">
-                                        <label htmlFor="edit-date">Дата проведения</label>
-                                        <input
-                                            type="date"
-                                            id="edit-date"
-                                            value={selectedEvent?.date || ""}
-                                            onChange={(e) =>
-                                                setSelectedEvent({ ...selectedEvent, date: e.target.value })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="name-event-container">
-                                        <label htmlFor="edit-time">Время проведения</label>
-                                        <input
-                                            type="time"
-                                            id="edit-time"
-                                            value={selectedEvent?.time || ""}
-                                            onChange={(e) =>
-                                                setSelectedEvent({ ...selectedEvent, time: e.target.value })
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                                <div className="name-event-container">
-                                    <label htmlFor="edit-place">Место проведения</label>
-                                    <input
-                                        type="text"
-                                        id="edit-place"
-                                        value={selectedEvent?.place || ""}
-                                        onChange={(e) =>
-                                            setSelectedEvent({ ...selectedEvent, place: e.target.value })
-                                        }
-                                    />
-                                </div>
-                                <div className="name-event-container">
-                                    <label htmlFor="edit-org">Организатор мероприятия</label>
-                                    <input
-                                        type="text"
-                                        id="edit-org"
-                                        value={selectedEvent?.organizer || ""}
-                                        onChange={(e) =>
-                                            setSelectedEvent({ ...selectedEvent, organizer: e.target.value })
-                                        }
-                                    />
-                                </div>
-                                <div className="name-event-container">
-                                    <label htmlFor="edit-image">Изображение</label>
-                                    <select
-                                        id="edit-image"
-                                        value={selectedEvent?.image || ""}
-                                        onChange={(e) =>
-                                            setSelectedEvent({ ...selectedEvent, image: e.target.value })
-                                        }
-                                    >
-                                        <option value="">Выберите изображение</option>
-                                        {Object.keys(eventImages).map((imageName) => (
-                                            <option key={imageName} value={imageName}>
-                                                {imageName}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="modal-buttons">
-                                <button id="save-button" onClick={handleSaveEdit}>
-                                    Сохранить
-                                </button>
-                                <button id="close-button" onClick={() => setEditModalOpen(false)}>
-                                    Закрыть
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <EditModal
+                        isOpen={editModalOpen}
+                        onClose={() => setEditModalOpen(false)}
+                        selectedEvent={selectedEvent}
+                        onSave={handleSaveEdit}
+                        eventImages={eventImages}
+                        onChange={setSelectedEvent}
+                    />
 
-                    {/* Модальное окно удаления */}
-                    <div id="delete-modal" className={`modal ${deleteModalOpen ? "active" : ""}`} onClick={handleModalClick}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <h2 id="delete-modal-title">Удаление мероприятия</h2>
-                            <p>Вы уверены, что хотите удалить мероприятие <br />"{selectedEvent?.title}"?</p>
-                            <div className="modal-buttons">
-                                <button id="confirm-delete-button" onClick={handleConfirmDelete}>
-                                    Удалить
-                                </button>
-                                <button id="cancel-delete-button" onClick={() => setDeleteModalOpen(false)}>
-                                    Отмена
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <DeleteModal
+                        isOpen={deleteModalOpen}
+                        onClose={() => setDeleteModalOpen(false)}
+                        selectedEvent={selectedEvent}
+                        onConfirm={handleConfirmDelete}
+                    />
 
-                    {/* Модальное окно просмотра информации */}
-                    <div id="view-modal" className={`modal ${viewModalOpen ? "active" : ""}`} onClick={handleModalClick}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <h2 id="view-modal-title">Информация о мероприятии</h2>
-                            <div className="form">
-                                <div className="name-event-container">
-                                    <label>Название мероприятия</label>
-                                    <p>{selectedEvent?.title}</p>
-                                </div>
-                                <div className="inputs-container">
-                                    <div className="name-event-container">
-                                        <label>Дата проведения</label>
-                                        <p>{selectedEvent?.date}</p>
-                                    </div>
-                                    <div className="name-event-container">
-                                        <label>Время проведения</label>
-                                        <p>{selectedEvent?.time}</p>
-                                    </div>
-                                </div>
-                                <div className="name-event-container">
-                                    <label>Место проведения</label>
-                                    <p>{selectedEvent?.place}</p>
-                                </div>
-                                <div className="name-event-container">
-                                    <label>Организатор мероприятия</label>
-                                    <p>{selectedEvent?.organizer}</p>
-                                </div>
-                                <div className="name-event-container">
-                                    <label>Изображение</label>
-                                    <img
-                                        src={eventImages[selectedEvent?.image]}
-                                        alt="Изображение мероприятия"
-                                        style={{ width: "50px", height: "50px", marginTop: "10px" }}
-                                    />
-                                </div>
-                            </div>
-                            <button id="close-button" onClick={() => setViewModalOpen(false)}>
-                                Закрыть
-                            </button>
-                        </div>
-                    </div>
+                    <ViewModal
+                        isOpen={viewModalOpen}
+                        onClose={() => setViewModalOpen(false)}
+                        selectedEvent={selectedEvent}
+                        eventImages={eventImages}
+                    />
 
-                    {/* Модальное окно добавления */}
-                    <div id="add-modal" className={`modal ${addModalOpen ? "active" : ""}`} onClick={handleModalClick}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <h2 id="add-modal-title">Добавить мероприятие</h2>
-                            <div className="form">
-                                <div className="name-event-container">
-                                    <label htmlFor="add-title">Название мероприятия</label>
-                                    <input
-                                        type="text"
-                                        id="add-title"
-                                        value={newEvent.title}
-                                        onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                                    />
-                                </div>
-                                <div className="inputs-container">
-                                    <div className="name-event-container">
-                                        <label htmlFor="add-date">Дата проведения</label>
-                                        <input
-                                            type="date"
-                                            id="add-date"
-                                            value={newEvent.date}
-                                            onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="name-event-container">
-                                        <label htmlFor="add-time">Время проведения</label>
-                                        <input
-                                            type="time"
-                                            id="add-time"
-                                            value={newEvent.time}
-                                            onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="name-event-container">
-                                    <label htmlFor="add-place">Место проведения</label>
-                                    <input
-                                        type="text"
-                                        id="add-place"
-                                        value={newEvent.place}
-                                        onChange={(e) => setNewEvent({ ...newEvent, place: e.target.value })}
-                                    />
-                                </div>
-                                <div className="name-event-container">
-                                    <label htmlFor="add-org">Организатор мероприятия</label>
-                                    <input
-                                        type="text"
-                                        id="add-org"
-                                        value={newEvent.organizer}
-                                        onChange={(e) => setNewEvent({ ...newEvent, organizer: e.target.value })}
-                                    />
-                                </div>
-                                <div className="name-event-container">
-                                    <label htmlFor="add-image">Изображение</label>
-                                    <select
-                                        id="add-image"
-                                        value={newEvent.image}
-                                        onChange={(e) => setNewEvent({ ...newEvent, image: e.target.value })}
-                                    >
-                                        <option value="">Выберите изображение</option>
-                                        {Object.keys(eventImages).map((imageName) => (
-                                            <option key={imageName} value={imageName}>
-                                                {imageName}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                {/* Предпросмотр изображения */}
-                                <div className="name-event-container">
-                                    <label>Предпросмотр изображения</label>
-                                    {newEvent.image && (
-                                        <img
-                                            src={eventImages[newEvent.image]}
-                                            alt="Предпросмотр"
-                                            style={{ width: "50px", height: "50px", marginTop: "10px" }}
-                                        />
-                                    )}
-                                </div>
-                            </div>
-                            <div className="modal-buttons">
-                                <button id="save-button" onClick={handleSaveNewEvent}>
-                                    Сохранить
-                                </button>
-                                <button id="close-button" onClick={() => setAddModalOpen(false)}>
-                                    Закрыть
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <AddModal
+                        isOpen={addModalOpen}
+                        onClose={() => setAddModalOpen(false)}
+                        newEvent={newEvent}
+                        onChange={setNewEvent}
+                        onSave={handleSaveNewEvent}
+                        eventImages={eventImages}
+                    />
 
                     <div className="calendar-page-content-footer">
                         <div className="add-btn" onClick={handleAddClick}>Добавить</div>

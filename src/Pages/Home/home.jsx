@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+import { Helmet } from "react-helmet";
 import "./index.css";
-import { Helmet } from 'react-helmet';
-import { Link } from "react-router";
 import Header from "../../Components/Header/Header";
 import user from "../../img/user.svg";
 import search from "../../img/search-icon.svg";
@@ -13,16 +12,28 @@ import china from "../../img/china_flag_icon.svg";
 import bell from "../../img/bell-icon.svg";
 import user_icon from "../../img/user-icon.svg";
 import chevron from "../../img/chevron-down.svg";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-
-const data = [
-  { name: 'ИСиП', 'Статистика активности': 8 },
-  { name: 'Нач. кл.', 'Статистика активности': 6 },
-  { name: 'Дошкол.', 'Статистика активности': 4 },
-  { name: 'Физ. кул.', 'Статистика активности': 2 },
-];
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { EventsContext } from "../../Components/EventsContext";
+import ViewModal from "../../Components/Calendar/ViewModal";
 
 const Home = () => {
+  const { eventsData } = useContext(EventsContext);
+  const [viewModalOpen, setViewModalOpen] = useState(false); // Состояние для открытия/закрытия модального окна
+  const [selectedEvent, setSelectedEvent] = useState(null); // Состояние для хранения выбранного мероприятия
+
+  const eventImages = {
+    "reshot-icon-student.svg": reshot,
+    "online_concert_interaction.svg": concert,
+    "calendar_event_star.svg": events,
+    "china_flag_icon.svg": china,
+  };
+
+  // Функция для открытия модального окна
+  const handleViewClick = (event) => {
+    setSelectedEvent(event);
+    setViewModalOpen(true);
+  };
+
   return (
     <>
       <Helmet>
@@ -55,75 +66,26 @@ const Home = () => {
                 </div>
               </div>
               <div className="events-items-container">
-                <div className="events-item">
-                  <div className="events-item-image-container">
-                    <img src={reshot} alt="" />
-                  </div>
-                  <div className="events-item-title">
-                    Второй Этап конкурса Студент года 2024
-                  </div>
-                  <div className="events-item-date-container">
-                    <div>
-                      <img src={clock} alt="" />
+                {eventsData.map((event) => (
+                  <div className="events-item" key={event._id}>
+                    <div className="events-item-image-container">
+                      <img src={eventImages[event.image]} alt="" />
                     </div>
-                    <div>04.03.2024</div>
-                  </div>
-                  <Link to="/calendar" className="events-item-button">Подробнее</Link>
-                </div>
-                <div className="events-item">
-                  <div className="events-item-image-container">
-                    <img src={concert} alt="" />
-                  </div>
-                  <div className="events-item-title">
-                    Концерт ко Дню Защитника Отечества
-                  </div>
-                  <div className="events-item-date-container">
-                    <div>
-                      <img src={clock} alt="" />
+                    <div className="events-item-title">{event.title}</div>
+                    <div className="events-item-date-container">
+                      <div>
+                        <img src={clock} alt="" />
+                      </div>
+                      <div>{event.date}</div>
                     </div>
-                    <div>22.02.2024</div>
-                  </div>
-                  <Link to="/calendar" className="events-item-button">Подробнее</Link>
-                </div>
-                <div className="events-item">
-                  <div className="events-item-image-container">
-                    <img src={events} alt="" />
-                  </div>
-                  <div className="events-item-title">Квиз в честь Дня студента</div>
-                  <div className="events-item-date-container">
-                    <div>
-                      <img src={clock} alt="" />
+                    <div
+                      className="events-item-button"
+                      onClick={() => handleViewClick(event)} // Обработчик для открытия модального окна
+                    >
+                      Подробнее
                     </div>
-                    <div>25.01.2024</div>
                   </div>
-                  <Link to="/calendar" className="events-item-button">Подробнее</Link>
-                </div>
-                <div className="events-item">
-                  <div className="events-item-image-container">
-                    <img src={china} alt="" />
-                  </div>
-                  <div className="events-item-title">Дни китайской культуры</div>
-                  <div className="events-item-date-container">
-                    <div>
-                      <img src={clock} alt="" />
-                    </div>
-                    <div>15.12.2023</div>
-                  </div>
-                  <Link to="/calendar" className="events-item-button">Подробнее</Link>
-                </div>
-                <div className="events-item">
-                  <div className="events-item-image-container">
-                    <img src={events} alt="" />
-                  </div>
-                  <div className="events-item-title">Открытие шахматного клуба</div>
-                  <div className="events-item-date-container">
-                    <div>
-                      <img src={clock} alt="" />
-                    </div>
-                    <div>08.12.2023</div>
-                  </div>
-                  <Link to="/calendar" className="events-item-button">Подробнее</Link>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -166,7 +128,12 @@ const Home = () => {
                 <BarChart
                   width={500}
                   height={400}
-                  data={data}
+                  data={[
+                    { name: "ИСиП", "Статистика активности": 8 },
+                    { name: "Нач. кл.", "Статистика активности": 6 },
+                    { name: "Дошкол.", "Статистика активности": 4 },
+                    { name: "Физ. кул.", "Статистика активности": 2 },
+                  ]}
                   margin={{
                     top: 10, right: -20, left: -20, bottom: 10,
                   }}
@@ -183,8 +150,16 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {/* Модальное окно для просмотра информации о мероприятии */}
+      <ViewModal
+        isOpen={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        selectedEvent={selectedEvent}
+        eventImages={eventImages}
+      />
     </>
   );
-}
+};
 
 export default Home;
