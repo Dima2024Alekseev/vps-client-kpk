@@ -155,18 +155,20 @@
 
 .modal-content {
   background-color: white;
-  padding: 42px 86px;
+  padding: 20px;
   margin: 10% auto;
-  width: auto;
-  max-width: calc(65% - 136px - 136px);
+  width: 100%; /* Ширина модального окна */
+  max-width: 600px; /* Максимальная ширина */
+  max-height: 120vh; /* Максимальная высота */
   border-radius: 10px;
   text-align: center;
   transform: scale(0.8);
   transition: transform 0.3s ease-in-out;
+  overflow-y: auto; /* Добавляем прокрутку, если содержимое слишком большое */
 }
 
 .modal.active .modal-content {
-  transform: scale(0.9);
+  transform: scale(0.8);
 }
 
 /* Стили для кнопок в модальных окнах */
