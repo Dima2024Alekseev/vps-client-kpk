@@ -10,7 +10,7 @@ import delete_ from "../../img/delete.svg";
 import concert from "../../img/online_concert_interaction.svg";
 import events from "../../img/calendar_event_star.svg";
 import china from "../../img/china_flag_icon.svg";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Pagination from "../../Components/Pagination"; // Импортируем компонент Pagination
 
 const Calendar = () => {
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -493,31 +493,11 @@ const Calendar = () => {
 
                     <div className="calendar-page-content-footer">
                         <div className="add-btn" onClick={handleAddClick}>Добавить</div>
-                        <div className="pagination-container">
-                            <button
-                                className="pagination-item"
-                                onClick={() => paginate(currentPage - 1)}
-                                disabled={currentPage === 1}
-                            >
-                                <FaChevronLeft />
-                            </button>
-                            {Array.from({ length: Math.ceil(sortedEvents.length / eventsPerPage) }, (_, index) => (
-                                <button
-                                    key={index + 1}
-                                    className={`pagination-item ${currentPage === index + 1 ? "active" : ""}`}
-                                    onClick={() => paginate(index + 1)}
-                                >
-                                    {index + 1}
-                                </button>
-                            ))}
-                            <button
-                                className="pagination-item"
-                                onClick={() => paginate(currentPage + 1)}
-                                disabled={currentPage === Math.ceil(sortedEvents.length / eventsPerPage)}
-                            >
-                                <FaChevronRight />
-                            </button>
-                        </div>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={Math.ceil(sortedEvents.length / eventsPerPage)}
+                            paginate={paginate}
+                        />
                     </div>
                 </div>
             </div>
