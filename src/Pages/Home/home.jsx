@@ -24,6 +24,8 @@ const Home = () => {
   const [pastEventsCount, setPastEventsCount] = useState(0); // Количество прошедших мероприятий
   const [currentUser, setCurrentUser] = useState(null); // Состояние для хранения текущего пользователя
   const [dailyQuote, setDailyQuote] = useState("Загрузка цитаты..."); // Цитата дня
+  const [searchQuery, setSearchQuery] = useState(""); // Состояние для поискового запроса
+  const [selectedDepartment, setSelectedDepartment] = useState("all"); // Состояние для выбранного отделения
 
   const eventImages = {
     "reshot-icon-student.svg": reshot,
@@ -94,9 +96,54 @@ const Home = () => {
         setDailyQuote({ text: "Не удалось загрузить цитату", author: "" });
       }
     };
-  
+
     fetchDailyQuote();
   }, []);
+
+  // Фильтрация мероприятий текущего месяца и ограничение до 5
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const eventsThisMonth = eventsData.filter((event) => {
+    const eventDate = new Date(event.date);
+    return (
+      eventDate.getMonth() === currentMonth &&
+      eventDate.getFullYear() === currentYear &&
+      eventDate > now
+    );
+  });
+
+  // Фильтрация мероприятий по поисковому запросу
+  const filteredEvents = eventsThisMonth
+    .filter((event) =>
+      event.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .slice(0, 5); // Ограничиваем до 5 мероприятий
+
+  // Обработчик изменения поискового запроса
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Данные для графика
+  const chartData = [
+    { name: "ИСиП", "Статистика активности": 8 },
+    { name: "Нач. кл.", "Статистика активности": 6 },
+    { name: "Дошкол.", "Статистика активности": 4 },
+    { name: "Физ. кул.", "Статистика активности": 2 },
+  ];
+
+  // Фильтрация данных для графика по выбранному отделению
+  const filteredChartData =
+    selectedDepartment === "all"
+      ? chartData // Если выбрано "Все отделения", показываем все данные
+      : chartData.filter((item) => item.name === selectedDepartment); // Иначе фильтруем по выбранному отделению
+
+  // Обработчик изменения выбранного отделения
+  const handleDepartmentChange = (e) => {
+    setSelectedDepartment(e.target.value);
+  };
 
   return (
     <>
@@ -125,15 +172,9 @@ const Home = () => {
             </div>
 
             <div className="events-container">
-              <div className="events-container-header">
-                <div className="events-container-title">Мероприятия</div>
-                <div className="events-tabs-container">
-                  <div className="events-tab active">Все</div>
-                  <div className="events-tab">Фильтры</div>
-                </div>
-              </div>
+              <div className="events-container-title">Мероприятия этого месяца</div>
               <div className="events-items-container">
-                {eventsData.map((event) => (
+                {filteredEvents.map((event) => (
                   <div className="events-item" key={event._id}>
                     <div className="events-item-image-container">
                       <img src={eventImages[event.image]} alt="" />
@@ -160,7 +201,13 @@ const Home = () => {
             <div className="home-page-content-right-side-header">
               <div className="search-container">
                 <img src={search} alt="search" />
-                <input type="text" className="search-input" />
+                <input
+                  type="text"
+                  className="search-input"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Поиск мероприятий..."
+                />
               </div>
               <div className="home-page-content-right-side-header-item">
                 <img src={bell} alt="bell" />
@@ -186,21 +233,18 @@ const Home = () => {
             </div>
             <div className="home-page-statistic-container">
               <div className="title">Статистика активности отделений</div>
-              <select>
-                <option value="option 1">Сорт</option>
-                <option value="option 2">Сорт 2</option>
-                <option value="option 3">Сорт 3</option>
+              <select value={selectedDepartment} onChange={handleDepartmentChange}>
+                <option value="all">Все отделения</option>
+                <option value="ИСиП">ИСиП</option>
+                <option value="Нач. кл.">Нач. кл.</option>
+                <option value="Дошкол.">Дошкол.</option>
+                <option value="Физ. кул.">Физ. кул.</option>
               </select>
               <div className="chart-container">
                 <BarChart
                   width={500}
                   height={400}
-                  data={[
-                    { name: "ИСиП", "Статистика активности": 8 },
-                    { name: "Нач. кл.", "Статистика активности": 6 },
-                    { name: "Дошкол.", "Статистика активности": 4 },
-                    { name: "Физ. кул.", "Статистика активности": 2 },
-                  ]}
+                  data={filteredChartData}
                   margin={{
                     top: 10, right: -20, left: -20, bottom: 10,
                   }}

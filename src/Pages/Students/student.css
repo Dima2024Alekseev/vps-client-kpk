@@ -1,3 +1,4 @@
+/* Основные стили для страницы */
 .student-page {
   display: flex;
   justify-content: center;
@@ -11,7 +12,7 @@
   flex-direction: column;
   align-items: center;
   gap: 18px;
-  padding: 0% 5%
+  padding: 0% 5%;
 }
 
 .student-page-header {
@@ -131,7 +132,6 @@ table {
 th,
 td {
   padding: 12px;
-  /* border-bottom: 1px solid #ddd; */
   text-align: left;
 }
 
@@ -197,121 +197,174 @@ tr:hover .action-buttons {
   align-items: center;
 }
 
-/* Второе модальное окно */
+/* Стили для модальных окон */
 .modal-overlay {
-  display: none;
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 8px;
-  width: calc(50% - 60px);
-  /* height: 73%; */
-  padding: 30px;
-  text-align: center;
-  z-index: 2;
-}
-
-.buttons-container {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 58px;
-  margin-bottom: 34px;
-}
-
-.active-btn {
-  color: rgb(255, 255, 255);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 25.78px;
-  letter-spacing: 0px;
-  text-align: center;
-  padding: 15px 41px;
-  background: #0052a2;
-  border: none;
-  outline: none;
-  border-radius: 12px;
-  margin-top: 34px;
-  cursor: pointer;
-  transition: all 0.3s ease-in;
-}
-
-.active-btn:hover {
-  background: #004890;
-}
-
-.close-btn {
-  color: rgb(255, 255, 255);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 25.78px;
-  letter-spacing: 0px;
-  text-align: center;
-  padding: 15px 41px;
-  background: #0052a2;
-  border: none;
-  outline: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease-in;
-}
-
-.filters-container {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  gap: 26px;
-}
-
-.filter-container {
-  display: flex;
   align-items: center;
-  gap: 5px;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.form-group {
   margin-bottom: 15px;
 }
 
-.container {
-  color: rgb(4, 67, 130);
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 38.67px;
-  letter-spacing: 0px;
-  text-align: left;
-  width: 40%;
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #555;
 }
 
-.filter-container select {
-  border-radius: 10px;
-  background: rgb(245, 245, 245);
-  padding: 6px 8px;
-  border: none;
-  outline: none;
-  width: calc(60% - 21px);
-  color: rgb(121, 121, 121);
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 160%;
-  letter-spacing: 0%;
-  text-align: left;
-}
-
-#dateInput {
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
   border-radius: 5px;
-  background: rgb(245, 245, 245);
-  padding: 4px 10px;
-  border: none;
-  outline: none;
-  color: rgb(0, 102, 203);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 160%;
-  letter-spacing: 0%;
-  text-align: left;
-  width: calc((85% - 21px) / 2);
+  font-size: 14px;
 }
 
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.save-btn,
+.close-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.save-btn {
+  background: #0052a2;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #004080;
+}
+
+.close-btn {
+  background: #ccc;
+  color: #333;
+}
+
+.close-btn:hover {
+  background: #bbb;
+}
+
+/* Стили для AddStudentModal */
+.add-student-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.add-student-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.add-student-form-group {
+  margin-bottom: 15px;
+}
+
+.add-student-form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #555;
+}
+
+.add-student-form-group input,
+.add-student-form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.add-student-form-group select {
+  background: white;
+  cursor: pointer;
+}
+
+.add-student-form-group select:focus {
+  outline: none;
+  border-color: #0052a2;
+}
+
+.add-student-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Пагинация */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination-item {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pagination-item.active {
+  background: #0052a2;
+  color: white;
+  border-color: #0052a2;
+}
+
+.pagination-item:hover {
+  background: #f0f0f0;
+}
+
+/* Адаптивные стили */
 @media screen and (min-width: 767px) and (max-width: 1024px) {
   body {
     width: calc(100% - 44px);
