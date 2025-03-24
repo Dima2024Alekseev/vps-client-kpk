@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Home from "./Pages/Home/home";
 import Calendar from "./Pages/Calendar/calendar";
-import Students from "./Pages/Students/students";
+import Students from "./Pages/Students/Students";
 import Statistics from "./Pages/Statistics/statistics";
 import Settings from "./Pages/Settings/settings";
 import Login from "./Pages/Authorization/login";

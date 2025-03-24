@@ -36,48 +36,57 @@ const Students = () => {
   const [students, setStudents] = useState([]);
   const [filteredStudentsCount, setFilteredStudentsCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [error, setError] = useState(null);
+  const [sortConfig, setSortConfig] = useState({
+    key: "fullName",
+    direction: "asc",
+  });
   const studentsPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const directionsResponse = await fetch("http://localhost:5000/api/directions");
-        if (!directionsResponse.ok) throw new Error("Ошибка при загрузке направлений");
-        const directionsData = await directionsResponse.json();
-        setDirections(directionsData);
+        setError(null);
 
-        const isipDirection = directionsData.find((direction) => direction.name === "ИСиП");
+        const [directionsRes, groupsRes, studentsRes] = await Promise.all([
+          fetch("http://localhost:5000/api/directions"),
+          fetch("http://localhost:5000/api/groups"),
+          fetch("http://localhost:5000/api/students")
+        ]);
+
+        if (!directionsRes.ok || !groupsRes.ok || !studentsRes.ok) {
+          throw new Error("Ошибка при загрузке данных");
+        }
+
+        const [directionsData, groupsData, studentsData] = await Promise.all([
+          directionsRes.json(),
+          groupsRes.json(),
+          studentsRes.json()
+        ]);
+
+        setDirections(directionsData);
+        setSpecialties(directionsData);
+        setGroups(sortGroupsAlphabetically(groupsData));
+        setStudents(studentsData);
+
+        const isipDirection = directionsData.find(d => d.name === "ИСиП");
         if (isipDirection) {
           setSelectedDirection(isipDirection._id);
           setSelectedDirectionDescription(isipDirection.description);
+
+          const directionGroups = sortGroupsAlphabetically(
+            groupsData.filter(g => isipDirection.groups.includes(g._id))
+          );
+
+          if (directionGroups.length > 0) {
+            setSelectedGroup(directionGroups[0]._id);
+            setCurrentGroupName(directionGroups[0].name);
+          }
         }
-
-        const groupsResponse = await fetch("http://localhost:5000/api/groups");
-        if (!groupsResponse.ok) throw new Error("Ошибка при загрузке групп");
-        const groupsData = await groupsResponse.json();
-        const sortedGroups = sortGroupsAlphabetically(groupsData);
-        setGroups(sortedGroups);
-
-        const directionGroups = isipDirection
-          ? sortedGroups.filter(group => isipDirection.groups.includes(group._id))
-          : sortedGroups;
-
-        if (directionGroups.length > 0) {
-          setSelectedGroup(directionGroups[0]._id);
-          setCurrentGroupName(directionGroups[0].name);
-        }
-
-        const specialtiesResponse = await fetch("http://localhost:5000/api/directions");
-        if (!specialtiesResponse.ok) throw new Error("Ошибка при загрузке специальностей");
-        const specialtiesData = await specialtiesResponse.json();
-        setSpecialties(specialtiesData);
-
-        const studentsResponse = await fetch("http://localhost:5000/api/students");
-        if (!studentsResponse.ok) throw new Error("Ошибка при загрузке студентов");
-        const studentsData = await studentsResponse.json();
-        setStudents(studentsData);
-      } catch (error) {
-        console.error("Ошибка:", error);
+      } catch (err) {
+        console.error("Ошибка при загрузке данных:", err);
+        setError(err.message);
       }
     };
 
@@ -91,63 +100,78 @@ const Students = () => {
   const getFilteredGroups = () => {
     if (!selectedDirection) return sortGroupsAlphabetically(groups);
 
-    const selectedDirectionObj = directions.find((dir) => dir._id === selectedDirection);
+    const selectedDirectionObj = directions.find(d => d._id === selectedDirection);
     if (!selectedDirectionObj) return sortGroupsAlphabetically(groups);
 
     return sortGroupsAlphabetically(
-      groups.filter((group) => selectedDirectionObj.groups.includes(group._id))
+      groups.filter(g => selectedDirectionObj.groups.includes(g._id))
     );
   };
 
   useEffect(() => {
     const group = groups.find(g => g._id === selectedGroup);
-    if (group) {
-      setCurrentGroupName(group.name);
-    } else {
-      setCurrentGroupName("");
-    }
+    setCurrentGroupName(group?.name || "");
   }, [selectedGroup, groups]);
 
-  // Получаем отфильтрованных студентов
-  const filteredStudents = students.filter(student => {
-    const directionMatch = !selectedDirection || student.specialty?._id === selectedDirection;
-    const groupMatch = !selectedGroup || student.group?._id === selectedGroup;
-    return directionMatch && groupMatch;
-  });
+  const getLastName = (fullName) => {
+    return fullName.split(" ")[0] || "";
+  };
 
-  // Получаем студентов для текущей страницы
+  const filteredStudents = students
+    .filter(student => {
+      const directionMatch = !selectedDirection || student.specialty?._id === selectedDirection;
+      const groupMatch = !selectedGroup || student.group?._id === selectedGroup;
+      return directionMatch && groupMatch;
+    })
+    .sort((a, b) => {
+      if (sortConfig.key === "fullName") {
+        const lastNameA = getLastName(a.fullName).toLowerCase();
+        const lastNameB = getLastName(b.fullName).toLowerCase();
+
+        if (sortConfig.direction === "asc") {
+          return lastNameA.localeCompare(lastNameB);
+        } else {
+          return lastNameB.localeCompare(lastNameA);
+        }
+      }
+      return 0;
+    });
+
   const indexOfLastStudent = currentPage * studentsPerPage;
   const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
   const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
 
   useEffect(() => {
     setFilteredStudentsCount(filteredStudents.length);
-    // Сбрасываем на первую страницу при изменении фильтров
     setCurrentPage(1);
   }, [filteredStudents.length, selectedDirection, selectedGroup]);
 
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
   };
 
   const handleDirectionChange = (e) => {
     const selectedId = e.target.value;
     setSelectedDirection(selectedId);
 
-    const selectedDirection = directions.find((direction) => direction._id === selectedId);
-    if (selectedDirection) {
-      setSelectedDirectionDescription(selectedDirection.description);
+    const direction = directions.find(d => d._id === selectedId);
+    if (direction) {
+      setSelectedDirectionDescription(direction.description);
 
-      const directionGroups = groups.filter(group =>
-        selectedDirection.groups.includes(group._id)
+      const directionGroups = getFilteredGroups().filter(g =>
+        direction.groups.includes(g._id)
       );
 
       if (directionGroups.length > 0) {
         setSelectedGroup(directionGroups[0]._id);
-        setCurrentGroupName(directionGroups[0].name);
       } else {
         setSelectedGroup("");
-        setCurrentGroupName("");
       }
     }
   };
@@ -158,7 +182,7 @@ const Students = () => {
 
   const handleNewStudentChange = (e) => {
     const { name, value } = e.target;
-    setNewStudent((prev) => ({
+    setNewStudent(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -178,52 +202,86 @@ const Students = () => {
         body: JSON.stringify(newStudent),
       });
 
-      if (response.ok) {
-        console.log("Студент успешно добавлен");
-        setIsAddModalOpen(false);
-        setNewStudent({
-          fullName: "",
-          group: "",
-          specialty: "",
-          studentId: "",
-        });
-
-        const studentsResponse = await fetch("http://localhost:5000/api/students");
-        if (!studentsResponse.ok) throw new Error("Ошибка при загрузке студентов");
-        const studentsData = await studentsResponse.json();
-        setStudents(studentsData);
-      } else {
-        console.error("Ошибка при добавлении студента");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Ошибка при добавлении студента");
       }
-    } catch (error) {
-      console.error("Ошибка:", error);
+
+      const addedStudent = await response.json();
+      setStudents(prev => [...prev, addedStudent]);
+      setIsAddModalOpen(false);
+      setNewStudent({
+        fullName: "",
+        group: "",
+        specialty: "",
+        studentId: "",
+      });
+    } catch (err) {
+      console.error("Ошибка при добавлении студента:", err);
+      alert(err.message);
     }
   };
 
-  const handleEditStudent = (studentId) => {
-    console.log("Редактирование студента с ID:", studentId);
+  const handleEditStudent = (student) => {
+    setSelectedStudent(student);
     setIsEditModalOpen(true);
   };
 
-  const handleDeleteStudent = async (studentId) => {
+  const handleSaveEditedStudent = async (updatedData) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/students/${studentId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/students/${selectedStudent._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedData),
+        }
+      );
 
-      if (response.ok) {
-        console.log("Студент успешно удален");
-        const studentsResponse = await fetch("http://localhost:5000/api/students");
-        if (!studentsResponse.ok) throw new Error("Ошибка при загрузке студентов");
-        const studentsData = await studentsResponse.json();
-        setStudents(studentsData);
-      } else {
-        console.error("Ошибка при удалении студента");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Ошибка при обновлении студента");
       }
-    } catch (error) {
-      console.error("Ошибка:", error);
+
+      const updatedStudent = await response.json();
+      setStudents(prev =>
+        prev.map(s => (s._id === updatedStudent._id ? updatedStudent : s))
+      );
+      setIsEditModalOpen(false);
+      setSelectedStudent(null);
+    } catch (err) {
+      console.error("Ошибка при обновлении студента:", err);
+      throw err;
     }
   };
+
+  const handleDeleteStudent = async (studentId) => {
+    if (!window.confirm("Вы уверены, что хотите удалить этого студента?")) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/students/${studentId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Ошибка при удалении студента");
+      }
+
+      setStudents(prev => prev.filter(s => s._id !== studentId));
+    } catch (err) {
+      console.error("Ошибка при удалении студента:", err);
+      alert("Не удалось удалить студента");
+    }
+  };
+
+  if (error) {
+    return <div className="error">Ошибка: {error}</div>;
+  }
 
   return (
     <>
@@ -278,7 +336,7 @@ const Students = () => {
                 <div className="input-icon-container">
                   <img src={search} alt="search" />
                 </div>
-                <input type="text" className="calendar-search-input" />
+                <input type="text" className="calendar-search-input" placeholder="Поиск..." />
               </div>
               <select
                 className="select"
@@ -295,7 +353,9 @@ const Students = () => {
                 className="select"
                 value={selectedGroup}
                 onChange={handleGroupChange}
+                disabled={!selectedDirection}
               >
+                <option value="">Все группы</option>
                 {getFilteredGroups().map((group) => (
                   <option key={group._id} value={group._id}>
                     {group.name}
@@ -311,31 +371,58 @@ const Students = () => {
               <table>
                 <thead>
                   <tr>
-                    <th>ФИО</th>
+                    <th
+                      onClick={() => requestSort("fullName")}
+                      className="sortable-header"
+                    >
+                      ФИО
+                      {sortConfig.key === "fullName" && (
+                        <span className="sort-icon">
+                          {sortConfig.direction === "asc" ? "↑" : "↓"}
+                        </span>
+                      )}
+                    </th>
                     <th>Группа</th>
                     <th>Специальность</th>
                     <th>Номер студ. билета</th>
-                    <th></th>
+                    <th>Действия</th>
                   </tr>
                 </thead>
                 <tbody id="table-body">
-                  {currentStudents.map((student) => (
-                    <tr key={student._id}>
-                      <td>{student.fullName}</td>
-                      <td>{student.group?.name}</td>
-                      <td>{student.specialty?.name}</td>
-                      <td>{student.studentId}</td>
-                      <td>
-                        <button onClick={() => handleEditStudent(student._id)}>Редактировать</button>
-                        <button onClick={() => handleDeleteStudent(student._id)}>Удалить</button>
+                  {currentStudents.length > 0 ? (
+                    currentStudents.map((student) => (
+                      <tr key={student._id}>
+                        <td>{student.fullName}</td>
+                        <td>{student.group?.name}</td>
+                        <td>{student.specialty?.name}</td>
+                        <td>{student.studentId}</td>
+                        <td className="actions">
+                          <button
+                            className="edit-btn"
+                            onClick={() => handleEditStudent(student)}
+                          >
+                            Редактировать
+                          </button>
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteStudent(student._id)}
+                          >
+                            Удалить
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="no-data">
+                        Нет данных для отображения
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
 
-            {/* Отображаем пагинацию только если студентов больше 10 */}
             {filteredStudents.length > studentsPerPage && (
               <div className="pagination-container">
                 <Pagination
@@ -366,7 +453,14 @@ const Students = () => {
 
             <EditStudentModal
               isOpen={isEditModalOpen}
-              onClose={() => setIsEditModalOpen(false)}
+              onClose={() => {
+                setIsEditModalOpen(false);
+                setSelectedStudent(null);
+              }}
+              student={selectedStudent}
+              onSave={handleSaveEditedStudent}
+              groups={groups}
+              directions={directions}
             />
 
             <AddStudentModal
