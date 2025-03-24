@@ -6,19 +6,19 @@ import studentPage from "../../img/studentPage/profile-2user.svg";
 import headerItem from "../../img/studentPage/profile-tick.svg";
 import save from "../../img/studentPage/save.svg";
 import search from "../../img/search-icon.svg";
-import chevronL from "../../img/chevron-left.svg";
-import chevronR from "../../img/chevron-right.svg";
 import StudentInfoModal from "../../Components/Modal_Student/StudentInfoModal";
 import ActivityModal from "../../Components/Modal_Student/ActivityModal";
 import ActivityFilterModal from "../../Components/Modal_Student/ActivityFilterModal";
 import EditStudentModal from "../../Components/Modal_Student/EditStudentModal";
 import AddStudentModal from "../../Components/Modal_Student/AddStudentModal";
+import Pagination from "../../Components/Pagination";
 
 const Students = () => {
   const [directions, setDirections] = useState([]);
   const [selectedDirection, setSelectedDirection] = useState("");
   const [selectedDirectionDescription, setSelectedDirectionDescription] = useState("");
   const [selectedGroup, setSelectedGroup] = useState("");
+  const [currentGroupName, setCurrentGroupName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [isActivityFilterModalOpen, setIsActivityFilterModalOpen] = useState(false);
@@ -34,6 +34,9 @@ const Students = () => {
   const [specialties, setSpecialties] = useState([]);
   const [selectedSpecialty, setSelectedSpecialty] = useState("");
   const [students, setStudents] = useState([]);
+  const [filteredStudentsCount, setFilteredStudentsCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const studentsPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,7 +55,17 @@ const Students = () => {
         const groupsResponse = await fetch("http://localhost:5000/api/groups");
         if (!groupsResponse.ok) throw new Error("Ошибка при загрузке групп");
         const groupsData = await groupsResponse.json();
-        setGroups(groupsData);
+        const sortedGroups = sortGroupsAlphabetically(groupsData);
+        setGroups(sortedGroups);
+
+        const directionGroups = isipDirection
+          ? sortedGroups.filter(group => isipDirection.groups.includes(group._id))
+          : sortedGroups;
+
+        if (directionGroups.length > 0) {
+          setSelectedGroup(directionGroups[0]._id);
+          setCurrentGroupName(directionGroups[0].name);
+        }
 
         const specialtiesResponse = await fetch("http://localhost:5000/api/directions");
         if (!specialtiesResponse.ok) throw new Error("Ошибка при загрузке специальностей");
@@ -71,28 +84,76 @@ const Students = () => {
     fetchData();
   }, []);
 
+  const sortGroupsAlphabetically = (groupsArray) => {
+    return [...groupsArray].sort((a, b) => a.name.localeCompare(b.name));
+  };
+
+  const getFilteredGroups = () => {
+    if (!selectedDirection) return sortGroupsAlphabetically(groups);
+
+    const selectedDirectionObj = directions.find((dir) => dir._id === selectedDirection);
+    if (!selectedDirectionObj) return sortGroupsAlphabetically(groups);
+
+    return sortGroupsAlphabetically(
+      groups.filter((group) => selectedDirectionObj.groups.includes(group._id))
+    );
+  };
+
+  useEffect(() => {
+    const group = groups.find(g => g._id === selectedGroup);
+    if (group) {
+      setCurrentGroupName(group.name);
+    } else {
+      setCurrentGroupName("");
+    }
+  }, [selectedGroup, groups]);
+
+  // Получаем отфильтрованных студентов
+  const filteredStudents = students.filter(student => {
+    const directionMatch = !selectedDirection || student.specialty?._id === selectedDirection;
+    const groupMatch = !selectedGroup || student.group?._id === selectedGroup;
+    return directionMatch && groupMatch;
+  });
+
+  // Получаем студентов для текущей страницы
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+
+  useEffect(() => {
+    setFilteredStudentsCount(filteredStudents.length);
+    // Сбрасываем на первую страницу при изменении фильтров
+    setCurrentPage(1);
+  }, [filteredStudents.length, selectedDirection, selectedGroup]);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   const handleDirectionChange = (e) => {
     const selectedId = e.target.value;
     setSelectedDirection(selectedId);
-    setSelectedGroup(""); // Сбрасываем выбранную группу
 
     const selectedDirection = directions.find((direction) => direction._id === selectedId);
     if (selectedDirection) {
       setSelectedDirectionDescription(selectedDirection.description);
+
+      const directionGroups = groups.filter(group =>
+        selectedDirection.groups.includes(group._id)
+      );
+
+      if (directionGroups.length > 0) {
+        setSelectedGroup(directionGroups[0]._id);
+        setCurrentGroupName(directionGroups[0].name);
+      } else {
+        setSelectedGroup("");
+        setCurrentGroupName("");
+      }
     }
   };
 
   const handleGroupChange = (e) => {
     setSelectedGroup(e.target.value);
-  };
-
-  const getFilteredGroups = () => {
-    if (!selectedDirection) return groups;
-
-    const selectedDirectionObj = directions.find((dir) => dir._id === selectedDirection);
-    if (!selectedDirectionObj) return groups;
-
-    return groups.filter((group) => selectedDirectionObj.groups.includes(group._id));
   };
 
   const handleNewStudentChange = (e) => {
@@ -179,7 +240,7 @@ const Students = () => {
               </div>
               <div className="header-title-container">
                 <div className="header-subtitle">Кол-во студентов</div>
-                <div className="header-title">{students.length}</div>
+                <div className="header-title">{filteredStudentsCount}</div>
               </div>
             </div>
 
@@ -209,7 +270,9 @@ const Students = () => {
                 <div className="student-page-body-header-title">
                   Специальность: {selectedDirectionDescription || "Информационные системы и программирование"}
                 </div>
-                <div className="student-page-body-header-group">Группа: 203</div>
+                <div className="student-page-body-header-group">
+                  Группа: {currentGroupName || "Не выбрана"}
+                </div>
               </div>
               <div className="calendar-search-container">
                 <div className="input-icon-container">
@@ -233,7 +296,6 @@ const Students = () => {
                 value={selectedGroup}
                 onChange={handleGroupChange}
               >
-                <option value="">Выберите группу</option>
                 {getFilteredGroups().map((group) => (
                   <option key={group._id} value={group._id}>
                     {group.name}
@@ -257,38 +319,32 @@ const Students = () => {
                   </tr>
                 </thead>
                 <tbody id="table-body">
-                  {students
-                    .filter((student) => !selectedGroup || student.group?._id === selectedGroup)
-                    .map((student) => (
-                      <tr key={student._id}>
-                        <td>{student.fullName}</td>
-                        <td>{student.group?.name}</td>
-                        <td>{student.specialty?.name}</td>
-                        <td>{student.studentId}</td>
-                        <td>
-                          <button onClick={() => handleEditStudent(student._id)}>Редактировать</button>
-                          <button onClick={() => handleDeleteStudent(student._id)}>Удалить</button>
-                        </td>
-                      </tr>
-                    ))}
+                  {currentStudents.map((student) => (
+                    <tr key={student._id}>
+                      <td>{student.fullName}</td>
+                      <td>{student.group?.name}</td>
+                      <td>{student.specialty?.name}</td>
+                      <td>{student.studentId}</td>
+                      <td>
+                        <button onClick={() => handleEditStudent(student._id)}>Редактировать</button>
+                        <button onClick={() => handleDeleteStudent(student._id)}>Удалить</button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
 
-            <div className="pagination-container">
-              <div className="pagination-item">
-                <img src={chevronL} alt="" />
+            {/* Отображаем пагинацию только если студентов больше 10 */}
+            {filteredStudents.length > studentsPerPage && (
+              <div className="pagination-container">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(filteredStudents.length / studentsPerPage)}
+                  paginate={paginate}
+                />
               </div>
-              <div className="pagination-item active">1</div>
-              <div className="pagination-item">2</div>
-              <div className="pagination-item">3</div>
-              <div className="pagination-item">4</div>
-              <div className="pagination-item empty">...</div>
-              <div className="pagination-item">...</div>
-              <div className="pagination-item">
-                <img src={chevronR} alt="" />
-              </div>
-            </div>
+            )}
 
             <StudentInfoModal
               isOpen={isModalOpen}
