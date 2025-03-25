@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import "./student.css";
+import edit from "../../img/edit.svg";
+import delete_ from "../../img/delete.svg";
 import Header from "../../Components/Header/Header";
 import studentPage from "../../img/studentPage/profile-2user.svg";
 import headerItem from "../../img/studentPage/profile-tick.svg";
@@ -42,6 +44,7 @@ const Students = () => {
     key: "fullName",
     direction: "asc",
   });
+  const [searchQuery, setSearchQuery] = useState("");
   const studentsPerPage = 10;
 
   useEffect(() => {
@@ -117,11 +120,18 @@ const Students = () => {
     return fullName.split(" ")[0] || "";
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
   const filteredStudents = students
     .filter(student => {
       const directionMatch = !selectedDirection || student.specialty?._id === selectedDirection;
       const groupMatch = !selectedGroup || student.group?._id === selectedGroup;
-      return directionMatch && groupMatch;
+      const searchMatch = !searchQuery || 
+        getLastName(student.fullName).toLowerCase().includes(searchQuery.toLowerCase());
+      return directionMatch && groupMatch && searchMatch;
     })
     .sort((a, b) => {
       if (sortConfig.key === "fullName") {
@@ -144,7 +154,7 @@ const Students = () => {
   useEffect(() => {
     setFilteredStudentsCount(filteredStudents.length);
     setCurrentPage(1);
-  }, [filteredStudents.length, selectedDirection, selectedGroup]);
+  }, [filteredStudents.length, selectedDirection, selectedGroup, searchQuery]);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -301,7 +311,6 @@ const Students = () => {
                 <div className="header-title">{filteredStudentsCount}</div>
               </div>
             </div>
-
             <div className="header-item">
               <div className="icon-container">
                 <img src={headerItem} alt="" />
@@ -324,19 +333,17 @@ const Students = () => {
           </div>
           <div className="student-page-body">
             <div className="student-page-body-header">
-              <div className="student-page-body-header-title-container">
-                <div className="student-page-body-header-title">
-                  Специальность: {selectedDirectionDescription || "Информационные системы и программирование"}
-                </div>
-                <div className="student-page-body-header-group">
-                  Группа: {currentGroupName || "Не выбрана"}
-                </div>
-              </div>
               <div className="calendar-search-container">
                 <div className="input-icon-container">
                   <img src={search} alt="search" />
                 </div>
-                <input type="text" className="calendar-search-input" placeholder="Поиск..." />
+                <input 
+                  type="text" 
+                  className="calendar-search-input" 
+                  placeholder="Поиск" 
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
               </div>
               <select
                 className="select"
@@ -362,11 +369,18 @@ const Students = () => {
                   </option>
                 ))}
               </select>
-              <button className="add-btn" onClick={() => setIsAddModalOpen(true)}>
+              <button className="add-btn-student" onClick={() => setIsAddModalOpen(true)}>
                 Добавить
               </button>
             </div>
-
+            <div className="student-page-body-header-title-container">
+              <div className="student-page-body-header-title">
+                <h1>Специальность:</h1> <h3>{selectedDirectionDescription || "Информационные системы и программирование"}</h3>
+              </div>
+              <div className="student-page-body-header-group">
+                <h4>Группа: {currentGroupName || "Не выбрана"}</h4>
+              </div>
+            </div>
             <div className="table-container">
               <table>
                 <thead>
@@ -391,23 +405,25 @@ const Students = () => {
                 <tbody id="table-body">
                   {currentStudents.length > 0 ? (
                     currentStudents.map((student) => (
-                      <tr key={student._id}>
-                        <td>{student.fullName}</td>
-                        <td>{student.group?.name}</td>
-                        <td>{student.specialty?.name}</td>
-                        <td>{student.studentId}</td>
+                      <tr key={student._id} className="student-row">
+                        <td className="student-cell">{student.fullName}</td>
+                        <td className="student-cell">{student.group?.name}</td>
+                        <td className="student-cell">{student.specialty?.name}</td>
+                        <td className="student-cell">{student.studentId}</td>
                         <td className="actions">
                           <button
-                            className="edit-btn"
+                            className="icon-btn"
                             onClick={() => handleEditStudent(student)}
+                            title="Редактировать"
                           >
-                            Редактировать
+                            <img src={edit} alt="Редактировать" className="action-icon" />
                           </button>
                           <button
-                            className="delete-btn"
+                            className="icon-btn"
                             onClick={() => handleDeleteStudent(student._id)}
+                            title="Удалить"
                           >
-                            Удалить
+                            <img src={delete_} alt="Удалить" className="action-icon" />
                           </button>
                         </td>
                       </tr>

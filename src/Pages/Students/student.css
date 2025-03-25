@@ -15,6 +15,15 @@
   padding: 0% 5%;
 }
 
+.position-direction-and-button {
+  display: flex;
+  flex-direction: row;
+}
+
+.position-select {
+  display: flex;
+}
+
 .student-page-header {
   width: 96%;
   padding: 30px 50px;
@@ -89,7 +98,19 @@
 .student-page-body-header-title-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  margin-top: 30px;
+
+}
+
+.student-page-body-header-title-container h1,
+.student-page-body-header-title h2,
+.student-page-body-header-title-container h4 {
+  margin: 0;
+}
+
+.student-page-body-header-title h3 {
+  font-weight: normal;
+
 }
 
 .student-page-body-header-title {
@@ -112,16 +133,23 @@
 
 .select {
   padding: 11px 15px;
-  border-radius: 24px;
+  border-radius: 10px;
   background: rgb(245, 245, 245);
   border: none;
   outline: none;
+  width: 150px;
 }
 
+
+
+/* Стили для таблицы */
 .table-container {
   width: 100%;
   margin: 20px auto;
   border-collapse: collapse;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 table {
@@ -129,16 +157,84 @@ table {
   border-collapse: collapse;
 }
 
+thead {
+  background-color: #f8f9fa;
+}
+
 th,
 td {
-  padding: 12px;
-  text-align: left;
+  padding: 15px;
+  text-align: center;
+  /* Выравнивание по центру */
+  border-bottom: 1px solid #dee2e6;
 }
 
 th {
-  color: gray;
-  font-weight: normal;
+  color: #343a40;
+  font-weight: 600;
+  background-color: #0052a2;
+  color: white;
 }
+
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.sortable-header:hover {
+  background-color: #004080;
+}
+
+.sort-icon {
+  margin-left: 5px;
+  font-size: 12px;
+  color: white;
+}
+
+.student-row:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.student-row:hover {
+  background-color: #e2e6ea;
+}
+
+.student-cell {
+  vertical-align: middle;
+
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  transition: transform 0.2s;
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.action-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+  color: #6c757d;
+}
+
 
 .btn {
   background-color: #174ea6;
@@ -162,6 +258,19 @@ th {
 .action-buttons {
   display: none;
   gap: 8px;
+}
+
+.add-btn-student {
+  border-radius: 12px;
+  background: #0052a2;
+  padding: 10px 30px;
+  color: rgb(255, 255, 255);
+
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 25.78px;
+  letter-spacing: 0px;
+  text-align: center;
 }
 
 .edit-btn,
@@ -191,7 +300,7 @@ tr:hover .action-buttons {
 }
 
 .actions {
-  width: 250px;
+  /* width: 250px; */
   display: flex;
   gap: 9px;
   align-items: center;
@@ -203,13 +312,38 @@ tr:hover .action-buttons {
   position: relative;
 }
 
-.sortable-header:hover {
-  background-color: #f5f5f5;
-}
-
 .sort-icon {
   margin-left: 5px;
   font-size: 12px;
+}
+
+/* Стили для кнопок с иконками */
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  transition: transform 0.2s;
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.action-icon {
+  width: 30px;
+  height: auto;
+}
+
+/* Убедитесь, что кнопки выровнены по центру ячейки */
+td.actions {
+  text-align: center;
 }
 
 /* Стили для EditStudentModal */
@@ -530,9 +664,7 @@ tr:hover .action-buttons {
   border-color: #0052a2;
 }
 
-.pagination-item:hover {
-  background: #f0f0f0;
-}
+
 
 /* Адаптивные стили */
 @media screen and (min-width: 767px) and (max-width: 1024px) {
