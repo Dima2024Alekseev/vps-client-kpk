@@ -3,7 +3,9 @@ import "../../Pages/Students/student.css";
 
 const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions }) => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    lastName: "",
+    firstName: "",
+    middleName: "",
     group: "",
     studentId: "",
     specialty: ""
@@ -14,8 +16,12 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
 
   useEffect(() => {
     if (student) {
+      // Поддержка как старого формата (fullName), так и нового (раздельные поля)
+      const nameParts = student.fullName ? student.fullName.split(" ") : [];
       setFormData({
-        fullName: student.fullName || "",
+        lastName: student.lastName || nameParts[0] || "",
+        firstName: student.firstName || nameParts[1] || "",
+        middleName: student.middleName || nameParts.slice(2).join(" ") || "",
         group: student.group?._id || "",
         studentId: student.studentId || "",
         specialty: student.specialty?._id || ""
@@ -33,8 +39,8 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
     e.preventDefault();
 
     // Валидация
-    if (!formData.fullName || !formData.group || !formData.studentId || !formData.specialty) {
-      setError("Все поля обязательны для заполнения");
+    if (!formData.lastName || !formData.firstName || !formData.group || !formData.studentId || !formData.specialty) {
+      setError("Обязательные поля: Фамилия, Имя, Группа, Номер билета, Специальность");
       return;
     }
 
@@ -61,17 +67,36 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>ФИО</label>
+            <label>Фамилия*</label>
             <input
               type="text"
-              name="fullName"
-              value={formData.fullName}
+              name="lastName"
+              value={formData.lastName}
               onChange={handleChange}
               required
             />
           </div>
           <div className="form-group">
-            <label>Группа</label>
+            <label>Имя*</label>
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Отчество</label>
+            <input
+              type="text"
+              name="middleName"
+              value={formData.middleName}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>Группа*</label>
             <select
               name="group"
               value={formData.group}
@@ -87,7 +112,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
             </select>
           </div>
           <div className="form-group">
-            <label>Номер студенческого билета</label>
+            <label>Номер студенческого билета*</label>
             <input
               type="text"
               name="studentId"
@@ -97,7 +122,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
             />
           </div>
           <div className="form-group">
-            <label>Специальность</label>
+            <label>Специальность*</label>
             <select
               name="specialty"
               value={formData.specialty}

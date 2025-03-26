@@ -165,7 +165,6 @@ th,
 td {
   padding: 15px;
   text-align: center;
-  /* Выравнивание по центру */
   border-bottom: 1px solid #dee2e6;
 }
 
@@ -358,6 +357,7 @@ td.actions {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+
 }
 
 .edit-student-modal-content {
@@ -365,7 +365,7 @@ td.actions {
   padding: 30px;
   border-radius: 12px;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
   position: relative;
 }
@@ -521,6 +521,7 @@ td.actions {
   border-radius: 10px;
   width: 400px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
 }
 
 .modal-content h2 {

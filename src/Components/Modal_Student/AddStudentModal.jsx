@@ -30,11 +30,31 @@ const AddStudentModal = ({
         <h2>Добавить студента</h2>
         <div className="add-student-form">
           <div className="add-student-form-group">
-            <label>ФИО</label>
+            <label>Фамилия</label>
             <input
               type="text"
-              name="fullName"
-              value={newStudent.fullName}
+              name="lastName"
+              value={newStudent.lastName || ""}
+              onChange={onChange}
+              required
+            />
+          </div>
+          <div className="add-student-form-group">
+            <label>Имя</label>
+            <input
+              type="text"
+              name="firstName"
+              value={newStudent.firstName || ""}
+              onChange={onChange}
+              required
+            />
+          </div>
+          <div className="add-student-form-group">
+            <label>Отчество</label>
+            <input
+              type="text"
+              name="middleName"
+              value={newStudent.middleName || ""}
               onChange={onChange}
             />
           </div>
@@ -44,6 +64,7 @@ const AddStudentModal = ({
               name="specialty"
               value={newStudent.specialty}
               onChange={onChange}
+              required
             >
               <option value="">Выберите специальность</option>
               {specialties.map((specialty) => (
@@ -59,6 +80,7 @@ const AddStudentModal = ({
               name="group"
               value={newStudent.group}
               onChange={onChange}
+              required
             >
               <option value="">Выберите группу</option>
               {sortedGroups.map((group) => (
@@ -75,6 +97,7 @@ const AddStudentModal = ({
               name="studentId"
               value={newStudent.studentId}
               onChange={onChange}
+              required
             />
           </div>
         </div>

@@ -27,7 +27,9 @@ const Students = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newStudent, setNewStudent] = useState({
-    fullName: "",
+    lastName: "",
+    firstName: "",
+    middleName: "",
     group: "",
     specialty: "",
     studentId: "",
@@ -41,10 +43,13 @@ const Students = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({
-    key: "fullName",
+    key: "lastName",
     direction: "asc",
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [eventsCount, setEventsCount] = useState(0);
+  const [studentActivity, setStudentActivity] = useState(0);
+  const [studentEvents, setStudentEvents] = useState([]);
   const studentsPerPage = 10;
 
   useEffect(() => {
@@ -52,26 +57,35 @@ const Students = () => {
       try {
         setError(null);
 
-        const [directionsRes, groupsRes, studentsRes] = await Promise.all([
+        const [directionsRes, groupsRes, studentsRes, eventsRes] = await Promise.all([
           fetch("http://localhost:5000/api/directions"),
           fetch("http://localhost:5000/api/groups"),
-          fetch("http://localhost:5000/api/students")
+          fetch("http://localhost:5000/api/students"),
+          fetch("http://localhost:5000/api/events")
         ]);
 
-        if (!directionsRes.ok || !groupsRes.ok || !studentsRes.ok) {
+        if (!directionsRes.ok || !groupsRes.ok || !studentsRes.ok || !eventsRes.ok) {
           throw new Error("Ошибка при загрузке данных");
         }
 
-        const [directionsData, groupsData, studentsData] = await Promise.all([
+        const [directionsData, groupsData, studentsData, eventsData] = await Promise.all([
           directionsRes.json(),
           groupsRes.json(),
-          studentsRes.json()
+          studentsRes.json(),
+          eventsRes.json()
         ]);
 
         setDirections(directionsData);
         setSpecialties(directionsData);
         setGroups(sortGroupsAlphabetically(groupsData));
         setStudents(studentsData);
+        setEventsCount(eventsData.length);
+
+        // Рассчитываем среднюю активность студентов (примерная логика)
+        const activeStudents = studentsData.filter(student => student.events && student.events.length > 0).length;
+        const totalStudents = studentsData.length;
+        const activityPercentage = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 100) : 0;
+        setStudentActivity(activityPercentage);
 
         const isipDirection = directionsData.find(d => d.name === "ИСиП");
         if (isipDirection) {
@@ -96,6 +110,23 @@ const Students = () => {
     fetchData();
   }, []);
 
+  const loadStudentEvents = async (studentId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/students/${studentId}/events`);
+      if (!response.ok) throw new Error("Ошибка при загрузке мероприятий студента");
+      const events = await response.json();
+      setStudentEvents(events);
+    } catch (err) {
+      console.error("Ошибка:", err);
+    }
+  };
+
+  const handleStudentClick = (student) => {
+    setSelectedStudent(student);
+    loadStudentEvents(student._id);
+    setIsModalOpen(true);
+  };
+
   const sortGroupsAlphabetically = (groupsArray) => {
     return [...groupsArray].sort((a, b) => a.name.localeCompare(b.name));
   };
@@ -116,8 +147,8 @@ const Students = () => {
     setCurrentGroupName(group?.name || "");
   }, [selectedGroup, groups]);
 
-  const getLastName = (fullName) => {
-    return fullName.split(" ")[0] || "";
+  const getLastName = (student) => {
+    return student.lastName || student.fullName?.split(" ")[0] || "";
   };
 
   const handleSearchChange = (e) => {
@@ -129,22 +160,19 @@ const Students = () => {
     .filter(student => {
       const directionMatch = !selectedDirection || student.specialty?._id === selectedDirection;
       const groupMatch = !selectedGroup || student.group?._id === selectedGroup;
-      const searchMatch = !searchQuery || 
-        getLastName(student.fullName).toLowerCase().includes(searchQuery.toLowerCase());
+      const searchMatch = !searchQuery ||
+        getLastName(student).toLowerCase().includes(searchQuery.toLowerCase());
       return directionMatch && groupMatch && searchMatch;
     })
     .sort((a, b) => {
-      if (sortConfig.key === "fullName") {
-        const lastNameA = getLastName(a.fullName).toLowerCase();
-        const lastNameB = getLastName(b.fullName).toLowerCase();
+      const lastNameA = getLastName(a).toLowerCase();
+      const lastNameB = getLastName(b).toLowerCase();
 
-        if (sortConfig.direction === "asc") {
-          return lastNameA.localeCompare(lastNameB);
-        } else {
-          return lastNameB.localeCompare(lastNameA);
-        }
+      if (sortConfig.direction === "asc") {
+        return lastNameA.localeCompare(lastNameB);
+      } else {
+        return lastNameB.localeCompare(lastNameA);
       }
-      return 0;
     });
 
   const indexOfLastStudent = currentPage * studentsPerPage;
@@ -221,7 +249,9 @@ const Students = () => {
       setStudents(prev => [...prev, addedStudent]);
       setIsAddModalOpen(false);
       setNewStudent({
-        fullName: "",
+        lastName: "",
+        firstName: "",
+        middleName: "",
         group: "",
         specialty: "",
         studentId: "",
@@ -317,7 +347,7 @@ const Students = () => {
               </div>
               <div className="header-title-container">
                 <div className="header-subtitle">Активность</div>
-                <div className="header-title">50%</div>
+                <div className="header-title">{studentActivity}%</div>
               </div>
             </div>
 
@@ -327,7 +357,7 @@ const Students = () => {
               </div>
               <div className="header-title-container">
                 <div className="header-subtitle">Кол-во мероприятий</div>
-                <div className="header-title">190</div>
+                <div className="header-title">{eventsCount}</div>
               </div>
             </div>
           </div>
@@ -337,10 +367,10 @@ const Students = () => {
                 <div className="input-icon-container">
                   <img src={search} alt="search" />
                 </div>
-                <input 
-                  type="text" 
-                  className="calendar-search-input" 
-                  placeholder="Поиск" 
+                <input
+                  type="text"
+                  className="calendar-search-input"
+                  placeholder="Поиск"
                   value={searchQuery}
                   onChange={handleSearchChange}
                 />
@@ -386,11 +416,11 @@ const Students = () => {
                 <thead>
                   <tr>
                     <th
-                      onClick={() => requestSort("fullName")}
+                      onClick={() => requestSort("lastName")}
                       className="sortable-header"
                     >
                       ФИО
-                      {sortConfig.key === "fullName" && (
+                      {sortConfig.key === "lastName" && (
                         <span className="sort-icon">
                           {sortConfig.direction === "asc" ? "↑" : "↓"}
                         </span>
@@ -406,7 +436,9 @@ const Students = () => {
                   {currentStudents.length > 0 ? (
                     currentStudents.map((student) => (
                       <tr key={student._id} className="student-row">
-                        <td className="student-cell">{student.fullName}</td>
+                        <td className="student-cell" onClick={() => handleStudentClick(student)}>
+                          {student.lastName} {student.firstName} {student.middleName}
+                        </td>
                         <td className="student-cell">{student.group?.name}</td>
                         <td className="student-cell">{student.specialty?.name}</td>
                         <td className="student-cell">{student.studentId}</td>
@@ -454,12 +486,16 @@ const Students = () => {
               onClose={() => setIsModalOpen(false)}
               onEdit={() => setIsEditModalOpen(true)}
               onActivity={() => setIsActivityModalOpen(true)}
+              student={selectedStudent}
+              events={studentEvents}
             />
 
             <ActivityModal
               isOpen={isActivityModalOpen}
               onClose={() => setIsActivityModalOpen(false)}
               onFilter={() => setIsActivityFilterModalOpen(true)}
+              student={selectedStudent}
+              events={studentEvents}
             />
 
             <ActivityFilterModal
