@@ -2,12 +2,13 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Home from "./Pages/Home/home";
-import Calendar from "./Pages/Calendar/calendar";
+import Home from "./Pages/Home/Home";
+import Calendar from "./Pages/Calendar/Сalendar";
 import Students from "./Pages/Students/Students";
 import Statistics from "./Pages/Statistics/statistics";
 import Settings from "./Pages/Settings/settings";
 import Login from "./Pages/Authorization/login";
+import ProfilePage from "./Pages/Profile/Profile";
 import ScrollToTop from "./Components/ScrollToTop";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import { EventsProvider } from "./Components/EventsContext";
@@ -37,7 +38,8 @@ const App = () => {
           {/* Защищенные маршруты */}
           <Route
             path="/home"
-            element={<Home />} />
+            element={<Home />}
+          />
           <Route
             path="/calendar"
             element={
@@ -70,6 +72,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </EventsProvider>
     </Router>

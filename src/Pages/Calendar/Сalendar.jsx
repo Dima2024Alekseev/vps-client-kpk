@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import "./calendar.css";
 import Header from "../../Components/Header/Header";
@@ -16,6 +16,7 @@ import EditModal from "../../Components/Calendar/EditModal";
 import DeleteModal from "../../Components/Calendar/DeleteModal";
 import ViewModal from "../../Components/Calendar/ViewModal";
 import AddModal from "../../Components/Calendar/AddModal";
+import { toast } from "react-toastify";
 
 const Calendar = () => {
     const { eventsData, fetchEvents } = useContext(EventsContext);
@@ -43,6 +44,66 @@ const Calendar = () => {
         "calendar_event_star.svg": events,
         "china_flag_icon.svg": china,
     };
+
+    // Проверка предстоящих мероприятий
+    useEffect(() => {
+        const checkUpcomingEvents = () => {
+            const now = new Date();
+
+            eventsData.forEach(event => {
+                try {
+                    // Создаем объект Date из строк даты и времени
+                    const [year, month, day] = event.date.split('-');
+                    const [hours, minutes] = event.time.split(':');
+
+                    const eventDateTime = new Date(
+                        parseInt(year),
+                        parseInt(month) - 1,
+                        parseInt(day),
+                        parseInt(hours),
+                        parseInt(minutes)
+                    );
+
+                    const timeDiff = (eventDateTime - now) / (1000 * 60); // разница в минутах
+
+                    // Если до события осталось 5 минут
+                    if (timeDiff > 0 && timeDiff <= 5) {
+                        const notificationKey = `notified_${event._id}`;
+
+                        if (!localStorage.getItem(notificationKey)) {
+                            toast.info(`⏰ Скоро начнется: "${event.title}" в ${event.time}`, {
+                                position: "bottom-right",
+                                autoClose: 10000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored",
+                            });
+
+                            localStorage.setItem(notificationKey, 'true');
+
+                            // Удаляем флаг уведомления через 1 час после начала события
+                            setTimeout(() => {
+                                localStorage.removeItem(notificationKey);
+                            }, 60 * 60 * 1000);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Ошибка при проверке события:', error);
+                }
+            });
+        };
+
+        // Проверяем каждую минуту
+        const interval = setInterval(checkUpcomingEvents, 60000);
+
+        // Первая проверка сразу при загрузке
+        checkUpcomingEvents();
+
+        return () => clearInterval(interval);
+    }, [eventsData]);
 
     const filteredEvents = eventsData.filter((event) =>
         event.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -97,9 +158,11 @@ const Calendar = () => {
             if (response.ok) {
                 fetchEvents();
                 setEditModalOpen(false);
+                toast.success("Мероприятие успешно обновлено");
             }
         } catch (error) {
             console.error("Ошибка при обновлении мероприятия:", error);
+            toast.error("Ошибка при обновлении мероприятия");
         }
     };
 
@@ -112,9 +175,11 @@ const Calendar = () => {
             if (response.ok) {
                 fetchEvents();
                 setDeleteModalOpen(false);
+                toast.success("Мероприятие успешно удалено");
             }
         } catch (error) {
             console.error("Ошибка при удалении мероприятия:", error);
+            toast.error("Ошибка при удалении мероприятия");
         }
     };
 
@@ -139,9 +204,11 @@ const Calendar = () => {
                     organizer: "",
                     image: "",
                 });
+                toast.success("Мероприятие успешно добавлено");
             }
         } catch (error) {
             console.error("Ошибка при добавлении мероприятия:", error);
+            toast.error("Ошибка при добавлении мероприятия");
         }
     };
 
@@ -194,7 +261,7 @@ const Calendar = () => {
                                     <div>
                                         <img src={clock} alt="" />
                                     </div>
-                                    <div>{event.date}</div>
+                                    <div>{event.date} в {event.time}</div>
                                 </div>
                                 <div className="btn-container">
                                     <div

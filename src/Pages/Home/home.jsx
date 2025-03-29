@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import "./index.css";
 import Header from "../../Components/Header/Header";
@@ -15,17 +16,22 @@ import chevron from "../../img/chevron-down.svg";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { EventsContext } from "../../Components/EventsContext";
 import ViewModal from "../../Components/Calendar/ViewModal";
+import { toast } from "react-toastify";
+
+const NOTIFICATIONS_KEY = 'app_notifications';
 
 const Home = () => {
   const { eventsData } = useContext(EventsContext);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [upcomingEventsCount, setUpcomingEventsCount] = useState(0); // Количество будущих мероприятий
-  const [pastEventsCount, setPastEventsCount] = useState(0); // Количество прошедших мероприятий
-  const [currentUser, setCurrentUser] = useState(null); // Состояние для хранения текущего пользователя
-  const [dailyQuote, setDailyQuote] = useState("Загрузка цитаты..."); // Цитата дня
-  const [searchQuery, setSearchQuery] = useState(""); // Состояние для поискового запроса
-  const [selectedDepartment, setSelectedDepartment] = useState("all"); // Состояние для выбранного отделения
+  const [upcomingEventsCount, setUpcomingEventsCount] = useState(0);
+  const [pastEventsCount, setPastEventsCount] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [dailyQuote, setDailyQuote] = useState({ text: "Загрузка цитаты...", author: "" });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const eventImages = {
     "reshot-icon-student.svg": reshot,
@@ -34,63 +40,22 @@ const Home = () => {
     "china_flag_icon.svg": china,
   };
 
-  // Получаем данные пользователя из localStorage при загрузке компонента
+  // Загрузка данных при монтировании
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
       setCurrentUser(JSON.parse(userData));
     }
-  }, []);
 
-  // Функция для открытия модального окна
-  const handleViewClick = (event) => {
-    setSelectedEvent(event);
-    setViewModalOpen(true);
-  };
+    const savedNotifications = JSON.parse(localStorage.getItem(NOTIFICATIONS_KEY)) || [];
+    setNotifications(savedNotifications);
 
-  // Мемоизированная функция для подсчета мероприятий
-  const countEvents = useCallback(() => {
-    const now = new Date(); // Текущая дата
-    const currentMonth = now.getMonth(); // Текущий месяц (0-11)
-    const currentYear = now.getFullYear(); // Текущий год
-
-    // Фильтруем мероприятия текущего месяца
-    const eventsThisMonth = eventsData.filter((event) => {
-      const eventDate = new Date(event.date);
-      return (
-        eventDate.getMonth() === currentMonth &&
-        eventDate.getFullYear() === currentYear
-      );
-    });
-
-    // Разделяем на будущие и прошедшие
-    const upcomingEvents = eventsThisMonth.filter(
-      (event) => new Date(event.date) > now
-    );
-    const pastEvents = eventsThisMonth.filter(
-      (event) => new Date(event.date) <= now
-    );
-
-    // Устанавливаем количество
-    setUpcomingEventsCount(upcomingEvents.length);
-    setPastEventsCount(pastEvents.length);
-  }, [eventsData]);
-
-  // Вызываем функцию подсчета при изменении eventsData
-  useEffect(() => {
-    countEvents();
-  }, [countEvents]);
-
-  // Запрос к API для получения цитаты дня
-  useEffect(() => {
     const fetchDailyQuote = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/quotes/daily-quote");
-        if (!response.ok) {
-          throw new Error("Ошибка при загрузке цитаты");
-        }
+        if (!response.ok) throw new Error("Ошибка при загрузке цитаты");
         const data = await response.json();
-        setDailyQuote({ text: data.text, author: data.author }); // Разделяем текст и автора
+        setDailyQuote({ text: data.text, author: data.author });
       } catch (error) {
         console.error("Ошибка:", error);
         setDailyQuote({ text: "Не удалось загрузить цитату", author: "" });
@@ -100,33 +65,189 @@ const Home = () => {
     fetchDailyQuote();
   }, []);
 
-  // Фильтрация мероприятий текущего месяца и ограничение до 5
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
+  // Сохранение уведомлений при изменении
+  useEffect(() => {
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
+  }, [notifications]);
 
-  const eventsThisMonth = eventsData.filter((event) => {
-    const eventDate = new Date(event.date);
-    return (
-      eventDate.getMonth() === currentMonth &&
-      eventDate.getFullYear() === currentYear &&
-      eventDate > now
-    );
-  });
+  // Проверка предстоящих мероприятий
+  useEffect(() => {
+    const checkUpcomingEvents = () => {
+      const now = new Date();
+      const newNotifications = [];
 
-  // Фильтрация мероприятий по поисковому запросу
-  const filteredEvents = eventsThisMonth
-    .filter((event) =>
-      event.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .slice(0, 5); // Ограничиваем до 5 мероприятий
+      eventsData.forEach((event) => {
+        try {
+          const [year, month, day] = event.date.split('-');
+          const [hours, minutes] = event.time.split(':');
+          const eventDateTime = new Date(
+            parseInt(year),
+            parseInt(month) - 1,
+            parseInt(day),
+            parseInt(hours),
+            parseInt(minutes)
+          );
 
-  // Обработчик изменения поискового запроса
+          const timeDiff = (eventDateTime - now) / (1000 * 60);
+
+          if (timeDiff > 0 && timeDiff <= 5) {
+            const notificationKey = `notified_${event._id}`;
+            const notificationExists = notifications.some(n => n.eventId === event._id);
+
+            if (!localStorage.getItem(notificationKey) && !notificationExists) {
+              const notification = {
+                id: `${event._id}_${now.getTime()}`,
+                text: `Скоро начнется: "${event.title}" в ${event.time}`,
+                eventId: event._id,
+                date: new Date().toISOString(),
+                isRead: false
+              };
+
+              newNotifications.push(notification);
+              localStorage.setItem(notificationKey, 'true');
+
+              toast.info(notification.text, {
+                position: "bottom-right",
+                autoClose: 5000,
+              });
+
+              setTimeout(() => {
+                localStorage.removeItem(notificationKey);
+                setNotifications(prev => prev.filter(n => n.eventId !== event._id));
+              }, 60 * 60 * 1000);
+            }
+          }
+        } catch (error) {
+          console.error('Ошибка при проверке события:', error);
+        }
+      });
+
+      if (newNotifications.length > 0) {
+        setNotifications(prev => [...newNotifications, ...prev]);
+      }
+    };
+
+    const interval = setInterval(checkUpcomingEvents, 60000);
+    checkUpcomingEvents();
+    return () => clearInterval(interval);
+  }, [eventsData, notifications]);
+
+  // Подсчет событий
+  const countEvents = useCallback(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const eventsThisMonth = eventsData.filter((event) => {
+      const eventDate = new Date(event.date);
+      return (
+        eventDate.getMonth() === currentMonth &&
+        eventDate.getFullYear() === currentYear
+      );
+    });
+
+    const upcomingEvents = eventsThisMonth.filter((event) => {
+      const eventDate = new Date(event.date);
+      return eventDate.toDateString() === now.toDateString() || eventDate > now;
+    });
+
+    const pastEvents = eventsThisMonth.filter((event) => {
+      const eventDate = new Date(event.date);
+      return eventDate < now;
+    });
+
+    setUpcomingEventsCount(upcomingEvents.length);
+    setPastEventsCount(pastEvents.length);
+  }, [eventsData]);
+
+  useEffect(() => {
+    countEvents();
+  }, [countEvents]);
+
+  // Обработчики событий
+  const handleViewClick = (event) => {
+    setSelectedEvent(event);
+    setViewModalOpen(true);
+  };
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  // Данные для графика
+  const handleDepartmentChange = (e) => {
+    setSelectedDepartment(e.target.value);
+  };
+
+  // Компонент выпадающего списка уведомлений
+  const NotificationsDropdown = () => {
+    const unreadCount = notifications.filter(n => !n.isRead).length;
+
+    const markAsRead = (id) => {
+      setNotifications(prev =>
+        prev.map(n => n.id === id ? { ...n, isRead: true } : n)
+      );
+    };
+
+    return (
+      <div className={`notifications-dropdown ${showNotifications ? 'active' : ''}`}>
+        <div className="notifications-header">
+          <h3>Уведомления {unreadCount > 0 && `(${unreadCount})`}</h3>
+          <button
+            className="clear-btn"
+            onClick={() => {
+              setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+            }}
+          >
+            Прочитать все
+          </button>
+          <span className="close-btn" onClick={() => setShowNotifications(false)}>×</span>
+        </div>
+        <div className="notifications-list">
+          {notifications.length > 0 ? (
+            [...notifications]
+              .sort((a, b) => new Date(b.date) - new Date(a.date))
+              .map(notification => (
+                <div
+                  key={notification.id}
+                  className={`notification-item ${notification.isRead ? 'read' : 'unread'}`}
+                  onClick={() => {
+                    const event = eventsData.find(e => e._id === notification.eventId);
+                    if (event) {
+                      setSelectedEvent(event);
+                      setViewModalOpen(true);
+                      markAsRead(notification.id);
+                      setShowNotifications(false);
+                    }
+                  }}
+                >
+                  <p>{notification.text}</p>
+                  <small>{new Date(notification.date).toLocaleString()}</small>
+                </div>
+              ))
+          ) : (
+            <p className="no-notifications">Нет новых уведомлений</p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Фильтрация мероприятий для отображения
+  const eventsThisMonth = eventsData.filter((event) => {
+    const eventDate = new Date(event.date);
+    return (
+      eventDate.getMonth() === new Date().getMonth() &&
+      eventDate.getFullYear() === new Date().getFullYear() &&
+      (eventDate.toDateString() === new Date().toDateString() || eventDate > new Date())
+    );
+  });
+
+  const filteredEvents = eventsThisMonth
+    .filter((event) =>
+      event.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .slice(0, 5);
+
   const chartData = [
     { name: "ИСиП", "Статистика активности": 8 },
     { name: "Нач. кл.", "Статистика активности": 6 },
@@ -134,16 +255,11 @@ const Home = () => {
     { name: "Физ. кул.", "Статистика активности": 2 },
   ];
 
-  // Фильтрация данных для графика по выбранному отделению
-  const filteredChartData =
-    selectedDepartment === "all"
-      ? chartData // Если выбрано "Все отделения", показываем все данные
-      : chartData.filter((item) => item.name === selectedDepartment); // Иначе фильтруем по выбранному отделению
+  const filteredChartData = selectedDepartment === "all"
+    ? chartData
+    : chartData.filter((item) => item.name === selectedDepartment);
 
-  // Обработчик изменения выбранного отделения
-  const handleDepartmentChange = (e) => {
-    setSelectedDepartment(e.target.value);
-  };
+  const unreadNotificationsCount = notifications.filter(n => !n.isRead).length;
 
   return (
     <>
@@ -153,14 +269,13 @@ const Home = () => {
       <div className="home-page">
         <Header />
         <div className="home-page-content">
+          {/* Левая колонка */}
           <div className="home-page-content-left-side">
             <div className="user-profile">
               <div className="user-profile-left-side">
-                <div>
-                  <h1 className="greeting-container">
-                    Привет, {currentUser ? currentUser.username : "медвед"}!
-                  </h1>
-                </div>
+                <h1 className="greeting-container">
+                  Привет, {currentUser ? currentUser.username : "гость"}!
+                </h1>
                 <div className="quote-container">
                   <p className="quote-text">{dailyQuote.text}</p>
                   <p className="quote-author">{dailyQuote.author}</p>
@@ -181,9 +296,7 @@ const Home = () => {
                     </div>
                     <div className="events-item-title">{event.title}</div>
                     <div className="events-item-date-container">
-                      <div>
-                        <img src={clock} alt="" />
-                      </div>
+                      <div><img src={clock} alt="" /></div>
                       <div>{event.date}</div>
                     </div>
                     <div
@@ -197,6 +310,8 @@ const Home = () => {
               </div>
             </div>
           </div>
+
+          {/* Правая колонка */}
           <div className="home-page-content-right-side">
             <div className="home-page-content-right-side-header">
               <div className="search-container">
@@ -209,14 +324,31 @@ const Home = () => {
                   placeholder="Поиск мероприятий..."
                 />
               </div>
-              <div className="home-page-content-right-side-header-item">
-                <img src={bell} alt="bell" />
+              <div className="home-page-content-right-side-header-item notification-icon-container">
+                {unreadNotificationsCount > 0 && (
+                  <div className="notification-badge">
+                    {unreadNotificationsCount}
+                  </div>
+                )}
+                <img
+                  src={bell}
+                  alt="bell"
+                  onClick={() => {
+                    setShowNotifications(!showNotifications);
+                    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+                  }}
+                  className="notification-icon"
+                />
+                <NotificationsDropdown />
               </div>
               <div className="home-page-content-right-side-header-item">
-                <img src={user_icon} alt="" />
+                <Link to="/profile">
+                  <img src={user_icon} alt="" />
+                </Link>
                 <img src={chevron} alt="" />
               </div>
             </div>
+
             <div className="home-page-cards-container">
               <div className="home-page-card">
                 <div className="home-page-card-number">{upcomingEventsCount}</div>
@@ -231,6 +363,7 @@ const Home = () => {
                 </div>
               </div>
             </div>
+
             <div className="home-page-statistic-container">
               <div className="title">Статистика активности отделений</div>
               <select value={selectedDepartment} onChange={handleDepartmentChange}>
@@ -245,9 +378,7 @@ const Home = () => {
                   width={500}
                   height={400}
                   data={filteredChartData}
-                  margin={{
-                    top: 10, right: -20, left: -20, bottom: 10,
-                  }}
+                  margin={{ top: 10, right: -20, left: -20, bottom: 10 }}
                 >
                   <CartesianGrid strokeDasharray="15 0" />
                   <XAxis dataKey="name" />
@@ -262,7 +393,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Модальное окно для просмотра информации о мероприятии */}
       <ViewModal
         isOpen={viewModalOpen}
         onClose={() => setViewModalOpen(false)}
