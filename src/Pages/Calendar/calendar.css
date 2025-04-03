@@ -1,3 +1,4 @@
+/* Основные стили календаря */
 .calendar-page {
   width: 100%;
   display: flex;
@@ -54,8 +55,7 @@
   margin-bottom: 41px;
 }
 
-/* events item styles */
-
+/* Стили элементов событий */
 .events-item {
   display: flex;
   align-items: center;
@@ -63,6 +63,12 @@
   background: rgb(245, 245, 247);
   border-radius: 20px;
   padding: 19px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.events-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .events-item img {
@@ -79,6 +85,7 @@
   padding: 12px;
   background: white;
   border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .events-item-image-container img {
@@ -124,226 +131,19 @@
   border-radius: 10px;
   cursor: pointer;
   text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.events-item-button:hover {
+  background-color: rgb(4, 67, 130);
+  color: white;
 }
 
 .btn-container {
   cursor: pointer;
 }
 
-/* modal styles */
-
-/* Основные стили для модальных окон */
-.modal {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-}
-
-.modal.active {
-  display: flex;
-  opacity: 1;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  margin: 10% auto;
-  width: 100%; /* Ширина модального окна */
-  max-width: 600px; /* Максимальная ширина */
-  max-height: 120vh; /* Максимальная высота */
-  border-radius: 10px;
-  text-align: center;
-  transform: scale(0.8);
-  transition: transform 0.3s ease-in-out;
-  overflow-y: auto; /* Добавляем прокрутку, если содержимое слишком большое */
-}
-
-.modal.active .modal-content {
-  transform: scale(0.8);
-}
-
-/* Стили для кнопок в модальных окнах */
-.modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 34px;
-}
-
-#save-button,
-#close-button,
-#confirm-delete-button,
-#cancel-delete-button {
-  color: rgb(255, 255, 255);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 25.78px;
-  letter-spacing: 0px;
-  text-align: center;
-  padding: 15px 41px;
-  border: none;
-  outline: none;
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-#save-button,
-#confirm-delete-button {
-  background: #0052a2;
-}
-
-#close-button,
-#cancel-delete-button {
-  background: #ccc;
-  color: black;
-}
-
-/* Стили для модального окна просмотра */
-#view-modal .modal-content {
-  max-width: 600px;
-}
-
-#view-modal .form {
-  gap: 20px;
-}
-
-#view-modal .name-event-container p {
-  background: rgb(245, 245, 245);
-  padding: 12px 19px;
-  border-radius: 10px;
-  margin: 0;
-}
-
-#view-modal #close-button {
-  margin-top: 20px;
-}
-
-.close {
-  position: absolute;
-  right: 10px;
-  top: 5px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.name-event-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.name-event-container label {
-  color: rgb(102, 102, 102);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 32px;
-  letter-spacing: 0px;
-  text-align: left;
-  margin-bottom: 18px;
-}
-
-#modal-title,
-#view-modal-title,
-.modal-title {
-  color: rgb(4, 67, 130);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 25.78px;
-  letter-spacing: 0px;
-  text-align: center;
-  margin: 0;
-  margin-bottom: 18px;
-}
-
-.name-event-container input,
-p {
-  border: none;
-  outline: none;
-  border-radius: 10px;
-  background: rgb(245, 245, 245);
-  /* padding: 12px 19px; */
-  width: calc(100% - 38px);
-  color: rgb(18, 113, 206);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 25.78px;
-  letter-spacing: 0px;
-  text-align: left;
-  line-height: 1.5;
-}
-
-.name-event-container p {
-  width: calc(100% - 38px);
-  padding: 12px 19px;
-  margin: 0;
-}
-
-.inputs-container {
-  display: flex;
-  justify-content: flex-start;
-  gap: 68px;
-  align-items: center;
-}
-
-.input-icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#save-button,
-#close-button,
-#create-button {
-  color: rgb(255, 255, 255);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 25.78px;
-  letter-spacing: 0px;
-  text-align: center;
-  padding: 15px 41px;
-  background: #0052a2;
-  border: none;
-  outline: none;
-  border-radius: 12px;
-  margin-top: 34px;
-  cursor: pointer;
-}
-
-#confirm-delete-button {
-  background-color: #f63131;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-right: 10px;
-}
-
-#cancel-delete-button {
-  background-color: #ccc;
-  color: black;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* pagination styles */
-
+/* Стили пагинации */
 .calendar-page-content-footer {
   display: flex;
   justify-content: space-between;
@@ -355,12 +155,20 @@ p {
   background: #0052a2;
   padding: 21px 61px;
   color: rgb(255, 255, 255);
-
   font-size: 20px;
   font-weight: 400;
   line-height: 25.78px;
   letter-spacing: 0px;
   text-align: center;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background: #003d7a;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .pagination-container {
@@ -387,7 +195,7 @@ p {
   line-height: 100%;
   text-align: left;
   cursor: pointer;
-  transition: all 0.3s ease-in;
+  transition: all 0.3s ease;
 }
 
 .pagination-item.empty {
@@ -403,39 +211,281 @@ p {
 
 .pagination-item:hover {
   border: 1px solid rgb(0, 102, 203);
+  transform: translateY(-2px);
 }
 
 .pagination-item svg {
   width: 24px;
   height: 24px;
   color: rgb(64, 75, 82);
-  /* Цвет иконок */
+  transition: color 0.3s ease;
 }
 
 .pagination-item.active svg {
   color: rgb(255, 255, 255);
-  /* Цвет иконок в активном состоянии */
 }
 
 .pagination-item:hover svg {
   color: rgb(0, 102, 203);
-  /* Цвет иконок при наведении */
 }
 
-@media screen and (max-width: 767px) {
-  .modal-content {
-    width: 90%;
-    padding: 20px;
-    margin: 20% auto;
-  }
+/* Стили модальных окон */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
 
-  .inputs-container {
+.modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 30px;
+  position: relative;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.modal.active .modal-content {
+  transform: translateY(0);
+}
+
+.modal-title {
+  color: #0467d1;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.modal-button {
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.modal-button-primary {
+  background-color: #0467d1;
+  color: white;
+}
+
+.modal-button-primary:hover {
+  background-color: #0355b0;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-button-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.modal-button-secondary:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-button-danger {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.modal-button-danger:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили форм */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-input {
+  padding: 12px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  background-color: #f9f9f9;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #0467d1;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(4, 103, 209, 0.1);
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.image-preview {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-top: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 5px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.close-button:hover {
+  color: #333;
+  background-color: #f0f0f0;
+}
+
+/* Стили для просмотра информации */
+.info-text {
+  background: #f9f9f9;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #333;
+  margin: 0;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .calendar-page {
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
+    padding: 15px;
   }
 
-  .name-event-container input,
-  .name-event-container p {
+  .calendar-page-content {
+    width: calc(100% - 30px);
+    padding: 20px 15px;
+  }
+
+  .events-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .events-item-title {
     width: 100%;
+    font-size: 22px;
+  }
+
+  .events-item-date-container {
+    font-size: 24px;
+  }
+
+  .events-item-button {
+    width: 100%;
+    justify-content: center;
+    padding: 15px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .calendar-page-content-footer {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .add-btn {
+    width: 100%;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-buttons {
+    flex-direction: column;
+  }
+
+  .modal-button {
+    width: 100%;
+  }
+
+  .pagination-container {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination-item {
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
   }
 }

@@ -1,17 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
-import { toast } from "react-toastify"; // Импортируем toast
-import { useNavigate } from "react-router-dom"; // Импортируем useNavigate
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "./login.css";
 import logo_auth from "../../img/logo-auth.svg";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // Хук для навигации
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Проверяем, авторизован ли пользователь при монтировании компонента
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/home");
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Валидация полей
+    if (!username.trim() || !password.trim()) {
+      toast.error("Заполните все поля");
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
@@ -23,20 +40,25 @@ const Login = () => {
       });
 
       const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem("token", data.token); // Сохраняем токен
-        localStorage.setItem("user", JSON.stringify(data.user)); // Сохраняем данные пользователя
-        toast.success("Авторизация успешна!"); // Уведомление об успехе
 
-        // Переход на главную страницу через 1 секунду (чтобы уведомление успело показаться)
-        setTimeout(() => {
-          navigate("/home"); // Программный переход на главную страницу
-        }, 1000);
-      } else {
-        toast.error(data.error || "Ошибка при авторизации"); // Уведомление об ошибке
+      if (!response.ok) {
+        throw new Error(data.error || "Ошибка при авторизации");
       }
+
+      // Сохраняем данные
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      toast.success("Авторизация успешна!");
+
+      // Перенаправляем с задержкой для отображения toast
+      setTimeout(() => navigate("/home"), 1000);
+
     } catch (error) {
-      toast.error("Ошибка при авторизации"); // Уведомление об ошибке
+      console.error("Ошибка авторизации:", error);
+      toast.error(error.message || "Ошибка при авторизации");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -48,7 +70,7 @@ const Login = () => {
       <main className="auth-main-container">
         <div className="left-side-auth">
           <div className="left-side-auth-logo-container">
-            <img src={logo_auth} alt="" />
+            <img src={logo_auth} alt="Логотип" />
           </div>
         </div>
         <div className="right-side-auth">
@@ -61,6 +83,8 @@ const Login = () => {
                 className="right-side-auth-input"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                required
+                minLength={3}
               />
             </div>
             <div className="auth-form-item">
@@ -70,10 +94,16 @@ const Login = () => {
                 className="right-side-auth-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+              // minLength={6}
               />
             </div>
-            <button className="right-side-auth-button" type="submit">
-              Авторизоваться
+            <button
+              className="right-side-auth-button"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? "Загрузка..." : "Авторизоваться"}
             </button>
           </form>
         </div>

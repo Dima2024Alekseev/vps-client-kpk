@@ -4,61 +4,66 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
     if (!isOpen) return null;
 
     return (
-        <div id="modal" className="modal active" onClick={onClose}>
+        <div className={`modal ${isOpen ? "active" : ""}`} onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <h2 id="modal-title">Редактирование мероприятия</h2>
-                <div className="form">
-                    <div className="name-event-container">
-                        <label htmlFor="edit-title">Название мероприятия</label>
+                <button className="close-button" onClick={onClose}>&times;</button>
+                <h2 className="modal-title">Редактирование мероприятия</h2>
+                <div className="modal-form">
+                    <div className="form-group">
+                        <label className="form-label">Название мероприятия</label>
                         <input
                             type="text"
-                            id="edit-title"
+                            className="form-input"
                             value={selectedEvent?.title || ""}
                             onChange={(e) => onChange({ ...selectedEvent, title: e.target.value })}
                         />
                     </div>
-                    <div className="inputs-container">
-                        <div className="name-event-container">
-                            <label htmlFor="edit-date">Дата проведения</label>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label className="form-label">Дата проведения</label>
                             <input
                                 type="date"
-                                id="edit-date"
+                                className="form-input"
                                 value={selectedEvent?.date || ""}
                                 onChange={(e) => onChange({ ...selectedEvent, date: e.target.value })}
                             />
                         </div>
-                        <div className="name-event-container">
-                            <label htmlFor="edit-time">Время проведения</label>
+                        <div className="form-group">
+                            <label className="form-label">Время проведения</label>
                             <input
                                 type="time"
-                                id="edit-time"
+                                className="form-input"
                                 value={selectedEvent?.time || ""}
                                 onChange={(e) => onChange({ ...selectedEvent, time: e.target.value })}
                             />
                         </div>
                     </div>
-                    <div className="name-event-container">
-                        <label htmlFor="edit-place">Место проведения</label>
+
+                    <div className="form-group">
+                        <label className="form-label">Место проведения</label>
                         <input
                             type="text"
-                            id="edit-place"
+                            className="form-input"
                             value={selectedEvent?.place || ""}
                             onChange={(e) => onChange({ ...selectedEvent, place: e.target.value })}
                         />
                     </div>
-                    <div className="name-event-container">
-                        <label htmlFor="edit-org">Организатор мероприятия</label>
+
+                    <div className="form-group">
+                        <label className="form-label">Организатор</label>
                         <input
                             type="text"
-                            id="edit-org"
+                            className="form-input"
                             value={selectedEvent?.organizer || ""}
                             onChange={(e) => onChange({ ...selectedEvent, organizer: e.target.value })}
                         />
                     </div>
-                    <div className="name-event-container">
-                        <label htmlFor="edit-image">Изображение</label>
+
+                    <div className="form-group">
+                        <label className="form-label">Изображение</label>
                         <select
-                            id="edit-image"
+                            className="form-input"
                             value={selectedEvent?.image || ""}
                             onChange={(e) => onChange({ ...selectedEvent, image: e.target.value })}
                         >
@@ -69,14 +74,22 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
                                 </option>
                             ))}
                         </select>
+                        {selectedEvent?.image && (
+                            <img
+                                src={eventImages[selectedEvent.image]}
+                                alt="Предпросмотр"
+                                className="image-preview"
+                            />
+                        )}
                     </div>
                 </div>
+
                 <div className="modal-buttons">
-                    <button id="save-button" onClick={onSave}>
+                    <button className="modal-button modal-button-primary" onClick={onSave}>
                         Сохранить
                     </button>
-                    <button id="close-button" onClick={onClose}>
-                        Закрыть
+                    <button className="modal-button modal-button-secondary" onClick={onClose}>
+                        Отмена
                     </button>
                 </div>
             </div>

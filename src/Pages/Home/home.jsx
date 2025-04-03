@@ -289,24 +289,30 @@ const Home = () => {
             <div className="events-container">
               <div className="events-container-title">Мероприятия этого месяца</div>
               <div className="events-items-container">
-                {filteredEvents.map((event) => (
-                  <div className="events-item" key={event._id}>
-                    <div className="events-item-image-container">
-                      <img src={eventImages[event.image]} alt="" />
+                {filteredEvents.length > 0 ? (
+                  filteredEvents.map((event) => (
+                    <div className="events-item" key={event._id}>
+                      <div className="events-item-image-container">
+                        <img src={eventImages[event.image]} alt="" />
+                      </div>
+                      <div className="events-item-title">{event.title}</div>
+                      <div className="events-item-date-container">
+                        <div><img src={clock} alt="" /></div>
+                        <div>{event.date}</div>
+                      </div>
+                      <div
+                        className="events-item-button"
+                        onClick={() => handleViewClick(event)}
+                      >
+                        Подробнее
+                      </div>
                     </div>
-                    <div className="events-item-title">{event.title}</div>
-                    <div className="events-item-date-container">
-                      <div><img src={clock} alt="" /></div>
-                      <div>{event.date}</div>
-                    </div>
-                    <div
-                      className="events-item-button"
-                      onClick={() => handleViewClick(event)}
-                    >
-                      Подробнее
-                    </div>
+                  ))
+                ) : (
+                  <div className="no-events-message">
+                    В текущем месяце нет запланированных мероприятий
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>

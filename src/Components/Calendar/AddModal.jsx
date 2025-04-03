@@ -4,61 +4,69 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
     if (!isOpen) return null;
 
     return (
-        <div id="add-modal" className="modal active" onClick={onClose}>
+        <div className={`modal ${isOpen ? "active" : ""}`} onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <h2 id="add-modal-title">Добавить мероприятие</h2>
-                <div className="form">
-                    <div className="name-event-container">
-                        <label htmlFor="add-title">Название мероприятия</label>
+                <button className="close-button" onClick={onClose}>&times;</button>
+                <h2 className="modal-title">Добавить мероприятие</h2>
+                <div className="modal-form">
+                    <div className="form-group">
+                        <label className="form-label">Название мероприятия</label>
                         <input
                             type="text"
-                            id="add-title"
+                            className="form-input"
                             value={newEvent.title}
                             onChange={(e) => onChange({ ...newEvent, title: e.target.value })}
+                            placeholder="Введите название"
                         />
                     </div>
-                    <div className="inputs-container">
-                        <div className="name-event-container">
-                            <label htmlFor="add-date">Дата проведения</label>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label className="form-label">Дата проведения</label>
                             <input
                                 type="date"
-                                id="add-date"
+                                className="form-input"
                                 value={newEvent.date}
                                 onChange={(e) => onChange({ ...newEvent, date: e.target.value })}
                             />
                         </div>
-                        <div className="name-event-container">
-                            <label htmlFor="add-time">Время проведения</label>
+                        <div className="form-group">
+                            <label className="form-label">Время проведения</label>
                             <input
                                 type="time"
-                                id="add-time"
+                                className="form-input"
                                 value={newEvent.time}
                                 onChange={(e) => onChange({ ...newEvent, time: e.target.value })}
                             />
                         </div>
                     </div>
-                    <div className="name-event-container">
-                        <label htmlFor="add-place">Место проведения</label>
+
+                    <div className="form-group">
+                        <label className="form-label">Место проведения</label>
                         <input
                             type="text"
-                            id="add-place"
+                            className="form-input"
                             value={newEvent.place}
                             onChange={(e) => onChange({ ...newEvent, place: e.target.value })}
+                            placeholder="Введите место"
                         />
                     </div>
-                    <div className="name-event-container">
-                        <label htmlFor="add-org">Организатор мероприятия</label>
+
+                    <div className="form-group">
+                        <label className="form-label">Организатор</label>
                         <input
                             type="text"
-                            id="add-org"
+                            className="form-input"
                             value={newEvent.organizer}
                             onChange={(e) => onChange({ ...newEvent, organizer: e.target.value })}
+                            placeholder="Введите организатора"
                         />
                     </div>
-                    <div className="name-event-container">
-                        <label htmlFor="add-image">Изображение</label>
+
+                    <div className="form-group">
+                        <label className="form-label">Изображение</label>
                         <select
-                            id="add-image"
+                            className="form-input"
                             value={newEvent.image}
                             onChange={(e) => onChange({ ...newEvent, image: e.target.value })}
                         >
@@ -69,24 +77,22 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 </option>
                             ))}
                         </select>
-                    </div>
-                    <div className="name-event-container">
-                        <label>Предпросмотр изображения</label>
                         {newEvent.image && (
                             <img
                                 src={eventImages[newEvent.image]}
                                 alt="Предпросмотр"
-                                style={{ width: "50px", height: "50px", marginTop: "10px" }}
+                                className="image-preview"
                             />
                         )}
                     </div>
                 </div>
+
                 <div className="modal-buttons">
-                    <button id="save-button" onClick={onSave}>
+                    <button className="modal-button modal-button-primary" onClick={onSave}>
                         Сохранить
                     </button>
-                    <button id="close-button" onClick={onClose}>
-                        Закрыть
+                    <button className="modal-button modal-button-secondary" onClick={onClose}>
+                        Отмена
                     </button>
                 </div>
             </div>
