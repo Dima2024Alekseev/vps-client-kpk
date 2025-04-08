@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Home from "./Pages/Home/Home";
 import Calendar from "./Pages/Calendar/Сalendar";
 import Students from "./Pages/Students/Students";
+import Teachers from "./Pages/Teachers/Teachers";
 import Statistics from "./Pages/Statistics/statistics";
 import Settings from "./Pages/Settings/settings";
 import Login from "./Pages/Authorization/login";
@@ -38,7 +39,11 @@ const App = () => {
           {/* Защищенные маршруты */}
           <Route
             path="/home"
-            element={<Home />}
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/calendar"
@@ -53,6 +58,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <Students />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teachers"
+            element={
+              <ProtectedRoute>
+                <Teachers />
               </ProtectedRoute>
             }
           />

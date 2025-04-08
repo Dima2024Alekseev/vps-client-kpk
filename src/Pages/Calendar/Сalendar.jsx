@@ -32,6 +32,11 @@ const Calendar = () => {
         place: "",
         organizer: "",
         image: "",
+        city: "",
+        responsible: "",
+        contactPerson: "",
+        students: [],
+        teachers: [],
     });
     const [currentPage, setCurrentPage] = useState(1);
     const eventsPerPage = 5;
@@ -203,6 +208,11 @@ const Calendar = () => {
                     place: "",
                     organizer: "",
                     image: "",
+                    city: "",
+                    responsible: "",
+                    contactPerson: "",
+                    students: [],
+                    teachers: [],
                 });
                 toast.success("Мероприятие успешно добавлено");
             }

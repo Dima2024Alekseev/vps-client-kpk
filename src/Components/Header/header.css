@@ -36,6 +36,8 @@
 .nav-menu-item .link img {
   opacity: 0.6; /* Иконки по умолчанию тусклые */
   transition: opacity 0.3s ease;
+  width: 35px;
+  height: auto;
 }
 
 .nav-menu-item .link.active img {
