@@ -4,9 +4,6 @@ import "./teachers-page.css";
 import edit from "../../img/edit.svg";
 import delete_ from "../../img/delete.svg";
 import Header from "../../Components/Header/Header";
-// import teacherPage from "../../img/teacherPage/profile-2user.svg";
-// import headerItem from "../../img/teacherPage/profile-tick.svg";
-// import save from "../../img/teacherPage/save.svg";
 import search from "../../img/search-icon.svg";
 import TeacherInfoModal from "../../Components/Teachers/TeacherInfoModal";
 import AddTeacherModal from "../../Components/Teachers/AddTeacherModal";
@@ -26,10 +23,8 @@ const Teachers = () => {
         department: "",
     });
     const [teachers, setTeachers] = useState([]);
-    const [filteredTeachersCount, setFilteredTeachersCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedTeacher, setSelectedTeacher] = useState(null);
-    const [error, setError] = useState(null);
     const [sortConfig, setSortConfig] = useState({
         key: "lastName",
         direction: "asc",
@@ -40,8 +35,6 @@ const Teachers = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setError(null);
-
                 const [departmentsRes, teachersRes] = await Promise.all([
                     fetch("http://localhost:5000/api/departments"),
                     fetch("http://localhost:5000/api/teachers")
@@ -64,7 +57,6 @@ const Teachers = () => {
                 }
             } catch (err) {
                 console.error("Ошибка при загрузке данных:", err);
-                setError(err.message);
             }
         };
 
@@ -108,7 +100,6 @@ const Teachers = () => {
     const currentTeachers = filteredTeachers.slice(indexOfFirstTeacher, indexOfLastTeacher);
 
     useEffect(() => {
-        setFilteredTeachersCount(filteredTeachers.length);
         setCurrentPage(1);
     }, [filteredTeachers.length, selectedDepartment, searchQuery]);
 
@@ -221,8 +212,6 @@ const Teachers = () => {
         }
     };
 
-
-
     return (
         <>
             <Helmet>
@@ -262,7 +251,6 @@ const Teachers = () => {
                                     Добавить
                                 </button>
                             </div>
-
                         </div>
                         <div className="table-container">
                             <table>
