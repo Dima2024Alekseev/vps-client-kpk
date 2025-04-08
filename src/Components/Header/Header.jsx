@@ -53,15 +53,16 @@ const Header = () => {
                             </Link>
                         </li>
                         <li className="nav-menu-item">
+                            <Link to="/teachers" className={`link ${location.pathname === "/teachers" ? "active" : ""}`} title="Преподаватели">
+                                <img src={teachers} alt="Teachers" />
+                            </Link>
+                        </li>
+                        <li className="nav-menu-item">
                             <Link to="/students" className={`link ${location.pathname === "/students" ? "active" : ""}`} title="Студенты">
                                 <img src={student} alt="Students" />
                             </Link>
                         </li>
-                        <li className="nav-menu-item">
-                            <Link to="/teachers" className={`link ${location.pathname === "/students" ? "active" : ""}`} title="Преподаватели">
-                                <img src={teachers} alt="Teachers" />
-                            </Link>
-                        </li>
+
                         <li className="nav-menu-item">
                             <Link to="/statistics" className={`link ${location.pathname === "/statistics" ? "active" : ""}`} title="Статистика">
                                 <img src={statistics} alt="Statistics" />
