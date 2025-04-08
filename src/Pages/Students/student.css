@@ -10,9 +10,9 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 18px;
-  padding: 0% 5%;
+  padding: 0% 3%;
 }
 
 .position-direction-and-button {
@@ -99,18 +99,15 @@
   display: flex;
   flex-direction: column;
   margin-top: 30px;
-
 }
 
 .student-page-body-header-title-container h1,
-.student-page-body-header-title h2,
 .student-page-body-header-title-container h4 {
   margin: 0;
 }
 
 .student-page-body-header-title h3 {
   font-weight: normal;
-
 }
 
 .student-page-body-header-title {
@@ -140,8 +137,6 @@
   width: 150px;
 }
 
-
-
 /* Стили для таблицы */
 .table-container {
   width: 100%;
@@ -164,7 +159,6 @@ thead {
 th,
 td {
   padding: 15px;
-  text-align: center;
   border-bottom: 1px solid #dee2e6;
 }
 
@@ -173,6 +167,7 @@ th {
   font-weight: 600;
   background-color: #0052a2;
   color: white;
+  text-align: center;
 }
 
 .sortable-header {
@@ -201,7 +196,12 @@ th {
 
 .student-cell {
   vertical-align: middle;
+  text-align: left;
+  padding: 0px 30px; /* Выравнивание по левому краю для столбца "ФИО" */
+}
 
+.student-cell.center {
+  text-align: center; /* Выравнивание по центру для других столбцов */
 }
 
 .actions {
@@ -234,7 +234,6 @@ th {
   color: #6c757d;
 }
 
-
 .btn {
   background-color: #174ea6;
   color: white;
@@ -264,7 +263,6 @@ th {
   background: #0052a2;
   padding: 10px 30px;
   color: rgb(255, 255, 255);
-
   font-size: 20px;
   font-weight: 400;
   line-height: 25.78px;
@@ -299,25 +297,6 @@ tr:hover .action-buttons {
 }
 
 .actions {
-  /* width: 250px; */
-  display: flex;
-  gap: 9px;
-  align-items: center;
-}
-
-.sortable-header {
-  cursor: pointer;
-  user-select: none;
-  position: relative;
-}
-
-.sort-icon {
-  margin-left: 5px;
-  font-size: 12px;
-}
-
-/* Стили для кнопок с иконками */
-.actions {
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -340,7 +319,6 @@ tr:hover .action-buttons {
   height: auto;
 }
 
-/* Убедитесь, что кнопки выровнены по центру ячейки */
 td.actions {
   text-align: center;
 }
@@ -357,7 +335,6 @@ td.actions {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-
 }
 
 .edit-student-modal-content {
@@ -522,7 +499,6 @@ td.actions {
   border-radius: 10px;
   width: 400px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-
 }
 
 .modal-content h2 {
@@ -665,8 +641,6 @@ td.actions {
   color: white;
   border-color: #0052a2;
 }
-
-
 
 /* Адаптивные стили */
 @media screen and (min-width: 767px) and (max-width: 1024px) {

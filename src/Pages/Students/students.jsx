@@ -439,9 +439,9 @@ const Students = () => {
                         <td className="student-cell" onClick={() => handleStudentClick(student)}>
                           {student.lastName} {student.firstName} {student.middleName}
                         </td>
-                        <td className="student-cell">{student.group?.name}</td>
-                        <td className="student-cell">{student.specialty?.name}</td>
-                        <td className="student-cell">{student.studentId}</td>
+                        <td className="student-cell center">{student.group?.name}</td>
+                        <td className="student-cell center">{student.specialty?.name}</td>
+                        <td className="student-cell center">{student.studentId}</td>
                         <td className="actions">
                           <button
                             className="icon-btn"
@@ -470,7 +470,6 @@ const Students = () => {
                 </tbody>
               </table>
             </div>
-
             {filteredStudents.length > studentsPerPage && (
               <div className="pagination-container">
                 <Pagination

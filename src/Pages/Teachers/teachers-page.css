@@ -1,0 +1,113 @@
+.teacher-page {
+    display: flex;
+    padding: 20px;
+}
+
+.teacher-page-content {
+    flex: 1 1;
+    flex-direction: column;
+    padding: 0px 50px;
+    align-items: center;
+}
+
+.teacher-page-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.teacher-page-body-header,
+.table-container,
+.pagination-container {
+    margin-bottom: 20px;
+}
+
+.teacher-page-body-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendar-search-container,
+.select-and-btn {
+    display: flex;
+    align-items: center;
+}
+
+.add-btn-teacher {
+    border-radius: 12px;
+    background: #0052a2;
+    padding: 10px 30px;
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 25.78px;
+    letter-spacing: 0px;
+    text-align: center;
+}
+
+.input-icon-container {
+    margin-right: 10px;
+}
+
+.select {
+    margin-right: 10px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+th {
+    text-align: center;
+}
+
+td.teacher-cell {
+    text-align: left;
+    padding: 0px 30px;
+}
+
+th.sortable-header {
+    cursor: pointer;
+}
+
+.sort-icon {
+    margin-left: 5px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.action-icon {
+    width: 30px;
+    height: auto;
+}
+
+.no-data {
+    text-align: center;
+    padding: 20px;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+}

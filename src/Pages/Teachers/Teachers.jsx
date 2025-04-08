@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
+import "./teachers-page.css";
 import edit from "../../img/edit.svg";
 import delete_ from "../../img/delete.svg";
 import Header from "../../Components/Header/Header";
@@ -230,26 +231,6 @@ const Teachers = () => {
             <div className="teacher-page">
                 <Header />
                 <div className="teacher-page-content">
-                    {/* <div className="teacher-page-header">
-                        <div className="header-item">
-                            <div className="icon-container">
-                                <img alt="" />
-                            </div>
-                            <div className="header-title-container">
-                                <div className="header-subtitle">Кол-во преподавателей</div>
-                                <div className="header-title">{filteredTeachersCount}</div>
-                            </div>
-                        </div>
-                        <div className="header-item">
-                            <div className="icon-container">
-                                <img alt="" />
-                            </div>
-                            <div className="header-title-container">
-                                <div className="header-subtitle">ПЦК</div>
-                                <div className="header-title">{departments.length}</div>
-                            </div>
-                        </div>
-                    </div> */}
                     <div className="teacher-page-body">
                         <div className="teacher-page-body-header">
                             <div className="calendar-search-container">
@@ -264,21 +245,24 @@ const Teachers = () => {
                                     onChange={handleSearchChange}
                                 />
                             </div>
-                            <select
-                                className="select"
-                                value={selectedDepartment}
-                                onChange={handleDepartmentChange}
-                            >
-                                <option value="">Все ПЦК</option>
-                                {departments.map((department) => (
-                                    <option key={department._id} value={department._id}>
-                                        {department.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <button className="add-btn-teacher" onClick={() => setIsAddModalOpen(true)}>
-                                Добавить
-                            </button>
+                            <div className="select-and-btn">
+                                <select
+                                    className="select"
+                                    value={selectedDepartment}
+                                    onChange={handleDepartmentChange}
+                                >
+                                    <option value="">Все ПЦК</option>
+                                    {departments.map((department) => (
+                                        <option key={department._id} value={department._id}>
+                                            {department.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <button className="add-btn-teacher" onClick={() => setIsAddModalOpen(true)}>
+                                    Добавить
+                                </button>
+                            </div>
+
                         </div>
                         <div className="table-container">
                             <table>
@@ -306,7 +290,7 @@ const Teachers = () => {
                                                 <td className="teacher-cell" onClick={() => handleTeacherClick(teacher)}>
                                                     {teacher.lastName} {teacher.firstName} {teacher.middleName}
                                                 </td>
-                                                <td className="teacher-cell">{teacher.department?.name}</td>
+                                                <td className="department-cell">{teacher.department?.name}</td>
                                                 <td className="actions">
                                                     <button
                                                         className="icon-btn"
