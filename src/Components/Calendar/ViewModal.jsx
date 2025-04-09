@@ -55,6 +55,24 @@ const ViewModal = ({ isOpen, onClose, selectedEvent, eventImages }) => {
                             />
                         )}
                     </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Студенты</label>
+                        <ul>
+                            {selectedEvent.students?.map((student) => (
+                                <li key={student._id}>{student.fullName}</li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Преподаватели</label>
+                        <ul>
+                            {selectedEvent.teachers?.map((teacher) => (
+                                <li key={teacher._id}>{teacher.fullName}</li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
 
                 <div className="modal-buttons" style={{ marginTop: '30px' }}>

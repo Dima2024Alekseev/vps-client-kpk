@@ -1,6 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) => {
+    const [students, setStudents] = useState([]);
+    const [teachers, setTeachers] = useState([]);
+
+    useEffect(() => {
+        const fetchStudents = async () => {
+            const response = await fetch("http://localhost:5000/api/students");
+            const data = await response.json();
+            setStudents(data);
+        };
+
+        const fetchTeachers = async () => {
+            const response = await fetch("http://localhost:5000/api/teachers");
+            const data = await response.json();
+            setTeachers(data);
+        };
+
+        fetchStudents();
+        fetchTeachers();
+    }, []);
+
     if (!isOpen) return null;
 
     return (
@@ -84,6 +104,44 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 className="image-preview"
                             />
                         )}
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Студенты</label>
+                        <select
+                            className="form-input"
+                            multiple
+                            value={newEvent.students || []}
+                            onChange={(e) => {
+                                const selectedStudents = Array.from(e.target.selectedOptions, option => option.value);
+                                onChange({ ...newEvent, students: selectedStudents });
+                            }}
+                        >
+                            {students.map((student) => (
+                                <option key={student._id} value={student._id}>
+                                    {student.fullName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Преподаватели</label>
+                        <select
+                            className="form-input"
+                            multiple
+                            value={newEvent.teachers || []}
+                            onChange={(e) => {
+                                const selectedTeachers = Array.from(e.target.selectedOptions, option => option.value);
+                                onChange({ ...newEvent, teachers: selectedTeachers });
+                            }}
+                        >
+                            {teachers.map((teacher) => (
+                                <option key={teacher._id} value={teacher._id}>
+                                    {teacher.fullName}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
