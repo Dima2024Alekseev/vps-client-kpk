@@ -10,7 +10,7 @@ import AddTeacherModal from "../../Components/Teachers/AddTeacherModal";
 import EditTeacherModal from "../../Components/Teachers/EditTeacherModal";
 import Pagination from "../../Components/Pagination";
 import ExcelExporter from "../../utils/ExcelExporter";
-import { FaFileExcel } from "react-icons/fa";
+import { FaFileExcel, FaUserPlus } from 'react-icons/fa';
 
 const Teachers = () => {
     const [departments, setDepartments] = useState([]);
@@ -262,8 +262,10 @@ const Teachers = () => {
                                         </option>
                                     ))}
                                 </select>
-                                <button className="add-btn-teacher" onClick={() => setIsAddModalOpen(true)}>
-                                    Добавить
+                                <button className="add-btn" onClick={() => setIsAddModalOpen(true)}>
+                                     <FaUserPlus className="add-icon" />
+                                      Добавить
+                                   
                                 </button>
                                 <button
                                     className="export-btn"

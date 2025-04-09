@@ -416,7 +416,7 @@ const Students = () => {
                 ))}
               </select>
               <button
-                className="add-btn-student"
+                className="add-btn"
                 onClick={() => setIsAddModalOpen(true)}
               >
                 <FaUserPlus className="add-icon" /> Добавить
