@@ -9,6 +9,8 @@ import TeacherInfoModal from "../../Components/Teachers/TeacherInfoModal";
 import AddTeacherModal from "../../Components/Teachers/AddTeacherModal";
 import EditTeacherModal from "../../Components/Teachers/EditTeacherModal";
 import Pagination from "../../Components/Pagination";
+import ExcelExporter from "../../utils/ExcelExporter";
+import { FaFileExcel } from "react-icons/fa";
 
 const Teachers = () => {
     const [departments, setDepartments] = useState([]);
@@ -212,6 +214,19 @@ const Teachers = () => {
         }
     };
 
+    const exportToExcel = async () => {
+        try {
+            await ExcelExporter.exportTeachers(
+                filteredTeachers,
+                departments,
+                selectedDepartment
+            );
+        } catch (err) {
+            console.error('Ошибка при экспорте в Excel:', err);
+            alert('Не удалось выполнить экспорт');
+        }
+    };
+
     return (
         <>
             <Helmet>
@@ -249,6 +264,14 @@ const Teachers = () => {
                                 </select>
                                 <button className="add-btn-teacher" onClick={() => setIsAddModalOpen(true)}>
                                     Добавить
+                                </button>
+                                <button
+                                    className="export-btn"
+                                    onClick={exportToExcel}
+                                    disabled={filteredTeachers.length === 0}
+                                    title="Экспорт в Excel"
+                                >
+                                    <FaFileExcel className="excel-icon" /> Экспорт
                                 </button>
                             </div>
                         </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
+import ExcelExporter from "../../utils/ExcelExporter";
 import "./student.css";
 import edit from "../../img/edit.svg";
 import delete_ from "../../img/delete.svg";
@@ -8,6 +9,7 @@ import studentPage from "../../img/studentPage/profile-2user.svg";
 import headerItem from "../../img/studentPage/profile-tick.svg";
 import save from "../../img/studentPage/save.svg";
 import search from "../../img/search-icon.svg";
+import { FaFileExcel, FaUserPlus } from 'react-icons/fa';
 import StudentInfoModal from "../../Components/Modal_Student/StudentInfoModal";
 import ActivityModal from "../../Components/Modal_Student/ActivityModal";
 import ActivityFilterModal from "../../Components/Modal_Student/ActivityFilterModal";
@@ -81,7 +83,6 @@ const Students = () => {
         setStudents(studentsData);
         setEventsCount(eventsData.length);
 
-        // Рассчитываем среднюю активность студентов (примерная логика)
         const activeStudents = studentsData.filter(student => student.events && student.events.length > 0).length;
         const totalStudents = studentsData.length;
         const activityPercentage = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 100) : 0;
@@ -319,6 +320,21 @@ const Students = () => {
     }
   };
 
+  // Функция для экспорта в Excel
+  const exportToExcel = async () => {
+    try {
+      await ExcelExporter.exportStudents(
+        filteredStudents,
+        directions,
+        selectedDirection,
+        currentGroupName
+      );
+    } catch (err) {
+      console.error('Ошибка при экспорте в Excel:', err);
+      alert('Не удалось выполнить экспорт');
+    }
+  };
+
   if (error) {
     return <div className="error">Ошибка: {error}</div>;
   }
@@ -399,8 +415,19 @@ const Students = () => {
                   </option>
                 ))}
               </select>
-              <button className="add-btn-student" onClick={() => setIsAddModalOpen(true)}>
-                Добавить
+              <button
+                className="add-btn-student"
+                onClick={() => setIsAddModalOpen(true)}
+              >
+                <FaUserPlus className="add-icon" /> Добавить
+              </button>
+              <button
+                className="export-btn"
+                onClick={exportToExcel}
+                disabled={filteredStudents.length === 0}
+                title="Экспорт в Excel"
+              >
+                <FaFileExcel className="excel-icon" /> Экспорт
               </button>
             </div>
             <div className="student-page-body-header-title-container">
