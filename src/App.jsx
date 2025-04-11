@@ -1,5 +1,5 @@
 import React from "react";
-import "./style/config.css";
+
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,7 +14,7 @@ import ProfilePage from "./Pages/Profile/Profile";
 import ScrollToTop from "./Components/ScrollToTop";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import { EventsProvider } from "./Components/EventsContext";
-
+import "./style/config.css";
 
 const App = () => {
   return (
