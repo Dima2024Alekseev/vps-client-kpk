@@ -27,18 +27,6 @@ body {
     width: 100% !important;
 }
 
-.home-page-content {
-    width: calc(95% - 101px);
-    display: flex;
-    justify-content: space-between;
-}
-
-.home-page-content-left-side {
-    width: 48%;
-    display: flex;
-    flex-direction: column;
-    margin-top: 54.14px;
-}
 
 .events-container {
     display: flex;
@@ -223,10 +211,6 @@ body {
     .home-page-content {
         flex-direction: column;
         align-items: center;
-    }
-
-    .home-page-content-left-side {
-        width: 100%;
     }
 
     .home-page-content-right-side {

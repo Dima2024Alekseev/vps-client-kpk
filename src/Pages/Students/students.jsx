@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
+import "./student.css";
 import { Helmet } from "react-helmet";
 import ExcelExporter from "../../utils/ExcelExporter";
-import "./student.css";
 import edit from "../../img/edit.svg";
 import delete_ from "../../img/delete.svg";
 import Header from "../../Components/Header/Header";

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
+import "./login.css";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "./login.css";
 import logo_auth from "../../img/logo-auth.svg";
 
 const Login = () => {

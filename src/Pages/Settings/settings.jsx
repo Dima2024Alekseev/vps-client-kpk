@@ -1,6 +1,6 @@
 import React from "react";
-import { Helmet } from "react-helmet";
 import "./settings.css";
+import { Helmet } from "react-helmet";
 import Header from "../../Components/Header/Header";
 
 

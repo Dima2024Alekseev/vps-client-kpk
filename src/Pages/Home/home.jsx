@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useCallback } from "react";
+import "./index.css";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import "./index.css";
 import Header from "../../Components/Header/Header";
 import user from "../../img/user.svg";
 import search from "../../img/search-icon.svg";

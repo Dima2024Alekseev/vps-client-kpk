@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Helmet } from "react-helmet";
 import "./teachers-page.css";
+import { Helmet } from "react-helmet";
 import edit from "../../img/edit.svg";
 import delete_ from "../../img/delete.svg";
 import Header from "../../Components/Header/Header";

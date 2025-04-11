@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router';
 import './style-profile-page.css';
+import { Link } from 'react-router';
 import Header from '../../Components/Header/Header';
 import profileIcon from "../../img/user-icon.svg";
 import notificationIcon from "../../img/bell-icon.svg";
