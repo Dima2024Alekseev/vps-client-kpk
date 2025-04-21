@@ -3,6 +3,10 @@ import React, { useEffect, useState } from "react";
 const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) => {
     const [students, setStudents] = useState([]);
     const [teachers, setTeachers] = useState([]);
+    const [searchStudent, setSearchStudent] = useState("");
+    const [searchTeacher, setSearchTeacher] = useState("");
+    const [isStudentListOpen, setIsStudentListOpen] = useState(false);
+    const [isTeacherListOpen, setIsTeacherListOpen] = useState(false);
 
     useEffect(() => {
         const fetchStudents = async () => {
@@ -21,10 +25,51 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
         fetchTeachers();
     }, []);
 
+    const handleAddStudent = (student) => {
+        if (!newEvent.students.some(s => s._id === student._id)) {
+            onChange({ ...newEvent, students: [...newEvent.students, student] });
+        }
+        setIsStudentListOpen(false);
+    };
+
+    const handleRemoveStudent = (studentId) => {
+        onChange({ ...newEvent, students: newEvent.students.filter(s => s._id !== studentId) });
+    };
+
+    const handleAddTeacher = (teacher) => {
+        if (!newEvent.teachers.some(t => t._id === teacher._id)) {
+            onChange({ ...newEvent, teachers: [...newEvent.teachers, teacher] });
+        }
+        setIsTeacherListOpen(false);
+    };
+
+    const handleRemoveTeacher = (teacherId) => {
+        onChange({ ...newEvent, teachers: newEvent.teachers.filter(t => t._id !== teacherId) });
+    };
+
+    const filteredStudents = students.filter(student =>
+        student.fullName.toLowerCase().includes(searchStudent.toLowerCase()) &&
+        !newEvent.students.some(s => s._id === student._id)
+    );
+
+    const filteredTeachers = teachers.filter(teacher =>
+        teacher.fullName.toLowerCase().includes(searchTeacher.toLowerCase()) &&
+        !newEvent.teachers.some(t => t._id === teacher._id)
+    );
+
+    const handleClickOutside = (e) => {
+        if (!e.target.closest('.student-list') && !e.target.closest('input[placeholder="Поиск студентов"]')) {
+            setIsStudentListOpen(false);
+        }
+        if (!e.target.closest('.teacher-list') && !e.target.closest('input[placeholder="Поиск преподавателей"]')) {
+            setIsTeacherListOpen(false);
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
-        <div className={`modal ${isOpen ? "active" : ""}`} onClick={onClose}>
+        <div className={`modal ${isOpen ? "active" : ""}`} onClick={handleClickOutside}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <button className="close-button" onClick={onClose}>&times;</button>
                 <h2 className="modal-title">Добавить мероприятие</h2>
@@ -108,40 +153,66 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
 
                     <div className="form-group">
                         <label className="form-label">Студенты</label>
-                        <select
-                            className="form-input"
-                            multiple
-                            value={newEvent.students || []}
-                            onChange={(e) => {
-                                const selectedStudents = Array.from(e.target.selectedOptions, option => option.value);
-                                onChange({ ...newEvent, students: selectedStudents });
-                            }}
-                        >
-                            {students.map((student) => (
-                                <option key={student._id} value={student._id}>
-                                    {student.fullName}
-                                </option>
+                        <div className="input-with-button">
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={searchStudent}
+                                onChange={(e) => setSearchStudent(e.target.value)}
+                                placeholder="Поиск студентов"
+                                onClick={() => setIsStudentListOpen(true)}
+                            />
+                        </div>
+                        {isStudentListOpen && (
+                            <div className="student-list">
+                                {filteredStudents.map((student) => (
+                                    <div key={student._id} className="student-item">
+                                        <span>{student.fullName}</span>
+                                        <button onClick={() => handleAddStudent(student)}>Добавить</button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <div className="selected-student-list">
+                            {newEvent.students.map((student) => (
+                                <div key={student._id} className="selected-student-item">
+                                    <span>{student.fullName}</span>
+                                    <button onClick={() => handleRemoveStudent(student._id)}>Удалить</button>
+                                </div>
                             ))}
-                        </select>
+                        </div>
                     </div>
 
                     <div className="form-group">
                         <label className="form-label">Преподаватели</label>
-                        <select
-                            className="form-input"
-                            multiple
-                            value={newEvent.teachers || []}
-                            onChange={(e) => {
-                                const selectedTeachers = Array.from(e.target.selectedOptions, option => option.value);
-                                onChange({ ...newEvent, teachers: selectedTeachers });
-                            }}
-                        >
-                            {teachers.map((teacher) => (
-                                <option key={teacher._id} value={teacher._id}>
-                                    {teacher.fullName}
-                                </option>
+                        <div className="input-with-button">
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={searchTeacher}
+                                onChange={(e) => setSearchTeacher(e.target.value)}
+                                placeholder="Поиск преподавателей"
+                                onClick={() => setIsTeacherListOpen(true)}
+                            />
+                        </div>
+                        {isTeacherListOpen && (
+                            <div className="teacher-list">
+                                {filteredTeachers.map((teacher) => (
+                                    <div key={teacher._id} className="teacher-item">
+                                        <span>{teacher.fullName}</span>
+                                        <button onClick={() => handleAddTeacher(teacher)}>Добавить</button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <div className="selected-teacher-list">
+                            {newEvent.teachers.map((teacher) => (
+                                <div key={teacher._id} className="selected-teacher-item">
+                                    <span>{teacher.fullName}</span>
+                                    <button onClick={() => handleRemoveTeacher(teacher._id)}>Удалить</button>
+                                </div>
                             ))}
-                        </select>
+                        </div>
                     </div>
                 </div>
 

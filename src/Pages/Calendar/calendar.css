@@ -229,6 +229,51 @@
   color: rgb(0, 102, 203);
 }
 
+.student-list,
+.teacher-list,
+.selected-student-list,
+.selected-teacher-list {
+  margin-top: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.student-item,
+.teacher-item,
+.selected-student-item,
+.selected-teacher-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.student-item button,
+.teacher-item button,
+.selected-student-item button,
+.selected-teacher-item button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  border: 1px solid #0467d1;
+  border-radius: 4px;
+  background-color: #0467d1;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.student-item button:hover,
+.teacher-item button:hover,
+.selected-student-item button:hover,
+.selected-teacher-item button:hover {
+  background-color: #0355b0;
+}
+
+
 /* Стили модальных окон */
 .modal {
   display: none;
