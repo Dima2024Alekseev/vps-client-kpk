@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import "./calendar.css";
+import { MdEventAvailable } from "react-icons/md";
 import Header from "../../Components/Header/Header";
 import search from "../../img/search-icon.svg";
 import reshot from "../../img/reshot-icon-student.svg";
@@ -265,7 +266,7 @@ const Calendar = () => {
                                     <div>
                                         <img src={clock} alt="" />
                                     </div>
-                                    <div>{event.date} в {event.time}</div>
+                                    <div><p>{event.date} в {event.time}</p></div>
                                 </div>
                                 <div className="btn-container">
                                     <div
@@ -323,7 +324,10 @@ const Calendar = () => {
                     />
 
                     <div className="calendar-page-content-footer">
-                        <div className="add-btn" onClick={handleAddClick}>Добавить</div>
+                        <div className="add-btn" onClick={handleAddClick}>
+                            <MdEventAvailable size={30} />
+                            Добавить
+                        </div>
                         <Pagination
                             currentPage={currentPage}
                             totalPages={Math.ceil(sortedEvents.length / eventsPerPage)}

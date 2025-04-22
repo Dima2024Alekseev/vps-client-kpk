@@ -38,10 +38,15 @@
 
 .header-item {
   display: flex;
-  align-items: flex-start;
-  gap: 29px;
-  padding-right: 39px;
-  border-right: 1px solid rgb(240, 240, 240);
+  align-items: center;
+  gap: 30px;
+}
+
+.vertical-line {
+  width: 2px;
+  height: 50px;
+  background-color: rgb(172, 172, 172);
+  margin: 0 10px;
 }
 
 .header-item:last-child {
@@ -59,17 +64,15 @@
 
 .header-title-container {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 10px;
 }
 
 .header-subtitle {
   color: rgb(172, 172, 172);
-  font-size: 12px;
+  font-size: 25px;
   font-weight: 400;
   line-height: 19px;
-  letter-spacing: -1%;
-  text-align: left;
 }
 
 .header-title {
@@ -91,8 +94,20 @@
 
 .student-page-body-header {
   display: flex;
-  gap: 30px;
+  justify-content: space-between;
   align-items: center;
+  gap: 30px;
+}
+
+.student-list-page{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.block-student-actions{
+  display: flex;
+  gap: 10px;
 }
 
 .student-page-body-header-title-container {
@@ -129,7 +144,7 @@
 }
 
 .export-btn {
-  border-radius: 25px;
+  border-radius: 12px;
   background: #0052a2;
   padding: 10px 30px;
   color: rgb(255, 255, 255);
@@ -140,6 +155,7 @@
   display: flex;
   align-items: center;
   text-align: center;
+  border: none;
 }
 
 .export-btn-student:disabled {
@@ -163,7 +179,7 @@
   font-size: 20px;
 }
 
-.add-btn {
+.add-btn-st {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -304,8 +320,8 @@ th {
   gap: 8px;
 }
 
-.add-btn {
-  border-radius: 25px;
+.add-btn-st {
+  border-radius: 12px;
   background: #0052a2;
   padding: 10px 30px;
   color: rgb(255, 255, 255);
@@ -314,6 +330,7 @@ th {
   line-height: 25.78px;
   letter-spacing: 0px;
   text-align: center;
+  border: none;
 }
 
 .edit-btn,
@@ -668,7 +685,7 @@ td.actions {
 /* Пагинация */
 .pagination-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   gap: 10px;
   margin-top: 20px;

@@ -6,7 +6,6 @@ const DeleteModal = ({ isOpen, onClose, selectedEvent, onConfirm }) => {
     return (
         <div className={`modal ${isOpen ? "active" : ""}`} onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="close-button" onClick={onClose}>&times;</button>
                 <h2 className="modal-title">Удаление мероприятия</h2>
                 <div className="modal-form">
                     <p style={{ textAlign: 'center', margin: '20px 0' }}>

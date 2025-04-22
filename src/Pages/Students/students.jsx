@@ -6,7 +6,6 @@ import edit from "../../img/edit.svg";
 import delete_ from "../../img/delete.svg";
 import Header from "../../Components/Header/Header";
 import studentPage from "../../img/studentPage/profile-2user.svg";
-import headerItem from "../../img/studentPage/profile-tick.svg";
 import save from "../../img/studentPage/save.svg";
 import search from "../../img/search-icon.svg";
 import { FaFileExcel, FaUserPlus } from 'react-icons/fa';
@@ -50,7 +49,6 @@ const Students = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [eventsCount, setEventsCount] = useState(0);
-  const [studentActivity, setStudentActivity] = useState(0);
   const [studentEvents, setStudentEvents] = useState([]);
   const studentsPerPage = 10;
 
@@ -82,11 +80,6 @@ const Students = () => {
         setGroups(sortGroupsAlphabetically(groupsData));
         setStudents(studentsData);
         setEventsCount(eventsData.length);
-
-        const activeStudents = studentsData.filter(student => student.events && student.events.length > 0).length;
-        const totalStudents = studentsData.length;
-        const activityPercentage = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 100) : 0;
-        setStudentActivity(activityPercentage);
 
         const isipDirection = directionsData.find(d => d.name === "ИСиП");
         if (isipDirection) {
@@ -353,33 +346,26 @@ const Students = () => {
                 <img src={studentPage} alt="" />
               </div>
               <div className="header-title-container">
-                <div className="header-subtitle">Кол-во студентов</div>
+                <div className="header-subtitle">Кол-во студентов:</div>
                 <div className="header-title">{filteredStudentsCount}</div>
               </div>
             </div>
-            <div className="header-item">
-              <div className="icon-container">
-                <img src={headerItem} alt="" />
-              </div>
-              <div className="header-title-container">
-                <div className="header-subtitle">Активность</div>
-                <div className="header-title">{studentActivity}%</div>
-              </div>
-            </div>
+            <div className="vertical-line"></div>
 
             <div className="header-item">
               <div className="icon-container">
                 <img src={save} alt="" />
               </div>
               <div className="header-title-container">
-                <div className="header-subtitle">Кол-во мероприятий</div>
+                <div className="header-subtitle">Кол-во мероприятий:</div>
                 <div className="header-title">{eventsCount}</div>
               </div>
             </div>
           </div>
           <div className="student-page-body">
             <div className="student-page-body-header">
-              <div className="calendar-search-container">
+              <div className="student-list-page">
+                <div className="calendar-search-container">
                 <div className="input-icon-container">
                   <img src={search} alt="search" />
                 </div>
@@ -415,8 +401,10 @@ const Students = () => {
                   </option>
                 ))}
               </select>
-              <button
-                className="add-btn"
+              </div>
+              <div className="block-student-actions">
+                <button
+                className="add-btn-st"
                 onClick={() => setIsAddModalOpen(true)}
               >
                 <FaUserPlus className="add-icon" /> Добавить
@@ -429,6 +417,8 @@ const Students = () => {
               >
                 <FaFileExcel className="excel-icon" /> Экспорт
               </button>
+              </div>
+              
             </div>
             <div className="student-page-body-header-title-container">
               <div className="student-page-body-header-title">

@@ -81,23 +81,18 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
         !selectedEvent.teachers.some(t => t._id === teacher._id)
     );
 
-    const handleClickOutside = (e) => {
-        if (!e.target.closest('.student-list') && !e.target.closest('input[placeholder="Поиск студентов"]')) {
-            setIsStudentListOpen(false);
-        }
-        if (!e.target.closest('.teacher-list') && !e.target.closest('input[placeholder="Поиск преподавателей"]')) {
-            setIsTeacherListOpen(false);
-        }
+    const handleFormClick = () => {
+        setIsStudentListOpen(false);
+        setIsTeacherListOpen(false);
     };
 
     if (!isOpen) return null;
 
     return (
-        <div className={`modal ${isOpen ? "active" : ""}`} onClick={handleClickOutside}>
+        <div className={`modal ${isOpen ? "active" : ""}`} onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="close-button" onClick={onClose}>&times;</button>
                 <h2 className="modal-title">Редактирование мероприятия</h2>
-                <div className="modal-form">
+                <div className="modal-form" onClick={handleFormClick}>
                     <div className="form-group">
                         <label className="form-label">Название мероприятия</label>
                         <input
@@ -181,11 +176,14 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
                                 value={searchStudent}
                                 onChange={(e) => setSearchStudent(e.target.value)}
                                 placeholder="Поиск студентов"
-                                onClick={() => setIsStudentListOpen(true)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsStudentListOpen(true);
+                                }}
                             />
                         </div>
                         {isStudentListOpen && (
-                            <div className="student-list">
+                            <div className="student-list" onClick={(e) => e.stopPropagation()}>
                                 {filteredStudents.map((student) => (
                                     <div key={student._id} className="student-item">
                                         <span>{student.fullName || "Неизвестно"}</span>
@@ -217,11 +215,14 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
                                 value={searchTeacher}
                                 onChange={(e) => setSearchTeacher(e.target.value)}
                                 placeholder="Поиск преподавателей"
-                                onClick={() => setIsTeacherListOpen(true)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsTeacherListOpen(true);
+                                }}
                             />
                         </div>
                         {isTeacherListOpen && (
-                            <div className="teacher-list">
+                            <div className="teacher-list" onClick={(e) => e.stopPropagation()}>
                                 {filteredTeachers.map((teacher) => (
                                     <div key={teacher._id} className="teacher-item">
                                         <span>{teacher.fullName || "Неизвестно"}</span>

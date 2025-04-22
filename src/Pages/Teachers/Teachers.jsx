@@ -262,7 +262,7 @@ const Teachers = () => {
                                         </option>
                                     ))}
                                 </select>
-                                <button className="add-btn" onClick={() => setIsAddModalOpen(true)}>
+                                <button className="add-btn-teacher" onClick={() => setIsAddModalOpen(true)}>
                                      <FaUserPlus className="add-icon" />
                                       Добавить
                                    

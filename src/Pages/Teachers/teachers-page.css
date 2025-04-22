@@ -50,6 +50,8 @@
     line-height: 25.78px;
     letter-spacing: 0px;
     text-align: center;
+    display: flex;
+    align-items: center;
 }
 
 .input-icon-container {
@@ -115,5 +117,5 @@ th.sortable-header {
 
 .pagination-container {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
 }

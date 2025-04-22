@@ -1,8 +1,7 @@
-/* Основные стили календаря */
 .calendar-page {
   width: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 50px;
   padding: 20px;
 }
@@ -25,12 +24,13 @@
 
 .calendar-page-content-header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 10px;
   align-self: flex-end;
 }
 
 .calendar-search-container {
+  padding: 5px 10px;
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -41,6 +41,7 @@
 
 .calendar-search-input {
   background: inherit;
+  padding: 0;
   width: 100%;
   border: none;
   outline: none;
@@ -105,9 +106,8 @@
 
 .events-item-date-container {
   color: rgb(0, 102, 203);
-  font-size: 32px;
+  font-size: 16px;
   font-weight: 400;
-  line-height: 25.78px;
   letter-spacing: 0px;
   text-align: left;
   display: flex;
@@ -151,18 +151,19 @@
 }
 
 .add-btn {
+  cursor: pointer;
   border-radius: 12px;
   background: #0052a2;
-  padding: 21px 61px;
+  padding: 15px 30px;
   color: rgb(255, 255, 255);
   font-size: 20px;
   font-weight: 400;
   line-height: 25.78px;
-  letter-spacing: 0px;
   text-align: center;
-  transition: all 0.2s ease;
-  border: none;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
 }
 
 .add-btn:hover {
@@ -173,6 +174,7 @@
 
 .pagination-container {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
   gap: 18px;
 }
@@ -429,29 +431,6 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-.close-button {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #999;
-  transition: all 0.2s ease;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-}
-
-.close-button:hover {
-  color: #333;
-  background-color: #f0f0f0;
-}
-
 /* Стили для просмотра информации */
 .info-text {
   background: #f9f9f9;
@@ -460,6 +439,88 @@
   font-size: 16px;
   color: #333;
   margin: 0;
+}
+
+/* Стили для карточек участников */
+.participants-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.participant-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.participant-card:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.participant-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #0467d1;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.participant-avatar.teacher {
+  background-color: #28a745;
+}
+
+.participant-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.participant-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Улучшенный предпросмотр изображения */
+.image-preview-large {
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-top: 10px;
+  background-color: white;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Адаптивные стили для списков */
+@media (max-width: 768px) {
+  .participants-list {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .participants-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Адаптивные стили */
