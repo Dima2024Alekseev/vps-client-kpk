@@ -7,6 +7,23 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
     const [searchTeacher, setSearchTeacher] = useState("");
     const [isStudentListOpen, setIsStudentListOpen] = useState(false);
     const [isTeacherListOpen, setIsTeacherListOpen] = useState(false);
+    const [isStudentFieldClicked, setIsStudentFieldClicked] = useState(false); // New state variable
+    const [isTeacherFieldClicked, setIsTeacherFieldClicked] = useState(false); // New state variable
+
+    // Начальное состояние для сброса
+    const initialEventState = {
+        title: "",
+        date: "",
+        time: "",
+        place: "",
+        city: "",
+        responsiblePerson: "",
+        contactPerson: "",
+        organizer: "",
+        image: "",
+        students: [],
+        teachers: []
+    };
 
     useEffect(() => {
         const fetchStudents = async () => {
@@ -30,6 +47,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
             onChange({ ...newEvent, students: [...newEvent.students, student] });
         }
         setIsStudentListOpen(false);
+        setSearchStudent(""); // Очищаем поиск после добавления
     };
 
     const handleRemoveStudent = (studentId) => {
@@ -41,10 +59,27 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
             onChange({ ...newEvent, teachers: [...newEvent.teachers, teacher] });
         }
         setIsTeacherListOpen(false);
+        setSearchTeacher(""); // Очищаем поиск после добавления
     };
 
     const handleRemoveTeacher = (teacherId) => {
         onChange({ ...newEvent, teachers: newEvent.teachers.filter(t => t._id !== teacherId) });
+    };
+
+    const handleClose = () => {
+        // Сбрасываем все поля к начальным значениям
+        onChange(initialEventState);
+        // Очищаем поисковые запросы
+        setSearchStudent("");
+        setSearchTeacher("");
+        // Закрываем списки
+        setIsStudentListOpen(false);
+        setIsTeacherListOpen(false);
+        // Сбрасываем состояние кликов
+        setIsStudentFieldClicked(false);
+        setIsTeacherFieldClicked(false);
+        // Вызываем оригинальный onClose
+        onClose();
     };
 
     const filteredStudents = students.filter(student =>
@@ -60,12 +95,14 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
     const handleFormClick = () => {
         setIsStudentListOpen(false);
         setIsTeacherListOpen(false);
+        setIsStudentFieldClicked(false); // Сбрасываем состояние кликов
+        setIsTeacherFieldClicked(false); // Сбрасываем состояние кликов
     };
 
     if (!isOpen) return null;
 
     return (
-        <div className={`modal ${isOpen ? "active" : ""}`} onClick={onClose}>
+        <div className={`modal ${isOpen ? "active" : ""}`} onClick={handleClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">Добавить мероприятие</h2>
                 <div className="modal-form" onClick={handleFormClick}>
@@ -109,6 +146,39 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                             value={newEvent.place}
                             onChange={(e) => onChange({ ...newEvent, place: e.target.value })}
                             placeholder="Введите место"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Город</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={newEvent.city}
+                            onChange={(e) => onChange({ ...newEvent, city: e.target.value })}
+                            placeholder="Введите город"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Ответственный за проведение</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={newEvent.responsiblePerson}
+                            onChange={(e) => onChange({ ...newEvent, responsiblePerson: e.target.value })}
+                            placeholder="Введите ответственного"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Контактное лицо</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={newEvent.contactPerson}
+                            onChange={(e) => onChange({ ...newEvent, contactPerson: e.target.value })}
+                            placeholder="Введите контактное лицо"
                         />
                     </div>
 
@@ -158,6 +228,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setIsStudentListOpen(true);
+                                    setIsStudentFieldClicked(true); // Устанавливаем состояние клика
                                 }}
                             />
                         </div>
@@ -171,14 +242,16 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 ))}
                             </div>
                         )}
-                        <div className="selected-student-list">
-                            {newEvent.students.map((student) => (
-                                <div key={student._id} className="selected-student-item">
-                                    <span>{student.fullName}</span>
-                                    <button onClick={() => handleRemoveStudent(student._id)}>Удалить</button>
-                                </div>
-                            ))}
-                        </div>
+                        {isStudentFieldClicked && ( // Условный рендеринг
+                            <div className="selected-student-list">
+                                {newEvent.students.map((student) => (
+                                    <div key={student._id} className="selected-student-item">
+                                        <span>{student.fullName}</span>
+                                        <button onClick={() => handleRemoveStudent(student._id)}>Удалить</button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-group">
@@ -193,6 +266,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setIsTeacherListOpen(true);
+                                    setIsTeacherFieldClicked(true); // Устанавливаем состояние клика
                                 }}
                             />
                         </div>
@@ -206,14 +280,16 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 ))}
                             </div>
                         )}
-                        <div className="selected-teacher-list">
-                            {newEvent.teachers.map((teacher) => (
-                                <div key={teacher._id} className="selected-teacher-item">
-                                    <span>{teacher.fullName}</span>
-                                    <button onClick={() => handleRemoveTeacher(teacher._id)}>Удалить</button>
-                                </div>
-                            ))}
-                        </div>
+                        {isTeacherFieldClicked && ( // Условный рендеринг
+                            <div className="selected-teacher-list">
+                                {newEvent.teachers.map((teacher) => (
+                                    <div key={teacher._id} className="selected-teacher-item">
+                                        <span>{teacher.fullName}</span>
+                                        <button onClick={() => handleRemoveTeacher(teacher._id)}>Удалить</button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -221,7 +297,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                     <button className="modal-button modal-button-primary" onClick={onSave}>
                         Сохранить
                     </button>
-                    <button className="modal-button modal-button-secondary" onClick={onClose}>
+                    <button className="modal-button modal-button-secondary" onClick={handleClose}>
                         Отмена
                     </button>
                 </div>

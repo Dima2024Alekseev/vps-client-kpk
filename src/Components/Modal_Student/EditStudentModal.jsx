@@ -11,34 +11,56 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
     specialty: ""
   });
 
+  const [initialData, setInitialData] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (student) {
-      // Поддержка как старого формата (fullName), так и нового (раздельные поля)
       const nameParts = student.fullName ? student.fullName.split(" ") : [];
-      setFormData({
+      const newFormData = {
         lastName: student.lastName || nameParts[0] || "",
         firstName: student.firstName || nameParts[1] || "",
         middleName: student.middleName || nameParts.slice(2).join(" ") || "",
         group: student.group?._id || "",
         studentId: student.studentId || "",
         specialty: student.specialty?._id || ""
-      });
+      };
+
+      setFormData(newFormData);
+      setInitialData(newFormData);
     }
   }, [student]);
 
+  const handleClose = () => {
+    setFormData(initialData);
+    setError("");
+    onClose();
+  };
+
+  const preventInvalidInput = (event) => {
+    if (!/^[А-Яа-я\s]*$/.test(event.key)) {
+      event.preventDefault();
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "lastName" || name === "firstName" || name === "middleName") {
+      if (!/^[А-Яа-я\s]*$/.test(value)) {
+        setError("Имя, фамилия и отчество могут содержать только русские буквы и пробелы");
+        return;
+      }
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }));
-    setError(""); // Сбрасываем ошибку при изменении поля
+    setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Валидация
     if (!formData.lastName || !formData.firstName || !formData.group || !formData.studentId || !formData.specialty) {
       setError("Обязательные поля: Фамилия, Имя, Группа, Номер билета, Специальность");
       return;
@@ -49,7 +71,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
 
     try {
       await onSave(formData);
-      onClose();
+      handleClose();
     } catch (err) {
       console.error("Ошибка при сохранении:", err);
       setError(err.message || "Произошла ошибка при сохранении");
@@ -73,6 +95,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
+              onKeyPress={preventInvalidInput}
               required
             />
           </div>
@@ -83,6 +106,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
+              onKeyPress={preventInvalidInput}
               required
             />
           </div>
@@ -93,6 +117,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
               name="middleName"
               value={formData.middleName}
               onChange={handleChange}
+              onKeyPress={preventInvalidInput}
             />
           </div>
           <div className="form-group">
@@ -141,7 +166,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
             <button
               type="button"
               className="close-btn"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={isSubmitting}
             >
               Закрыть

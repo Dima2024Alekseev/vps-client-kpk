@@ -7,6 +7,7 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
     const [searchTeacher, setSearchTeacher] = useState("");
     const [isStudentListOpen, setIsStudentListOpen] = useState(false);
     const [isTeacherListOpen, setIsTeacherListOpen] = useState(false);
+    const [initialEventData, setInitialEventData] = useState(null);
 
     useEffect(() => {
         const fetchStudents = async () => {
@@ -33,9 +34,28 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
         fetchTeachers();
     }, []);
 
-    if (!selectedEvent) {
-        return null;
-    }
+    useEffect(() => {
+        if (selectedEvent) {
+            // Сохраняем начальные данные при получении selectedEvent
+            setInitialEventData({
+                ...selectedEvent,
+                students: [...selectedEvent.students],
+                teachers: [...selectedEvent.teachers]
+            });
+        }
+    }, [selectedEvent]);
+
+    const handleClose = () => {
+        // Сбрасываем все изменения к начальным данным
+        if (initialEventData) {
+            onChange(initialEventData);
+        }
+        setSearchStudent("");
+        setSearchTeacher("");
+        setIsStudentListOpen(false);
+        setIsTeacherListOpen(false);
+        onClose();
+    };
 
     const handleAddStudent = (student) => {
         if (!selectedEvent.students.some(s => s._id === student._id)) {
@@ -45,6 +65,7 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
             });
         }
         setIsStudentListOpen(false);
+        setSearchStudent("");
     };
 
     const handleRemoveStudent = (studentId) => {
@@ -62,6 +83,7 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
             });
         }
         setIsTeacherListOpen(false);
+        setSearchTeacher("");
     };
 
     const handleRemoveTeacher = (teacherId) => {
@@ -73,12 +95,12 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
 
     const filteredStudents = allStudents.filter(student =>
         student.fullName?.toLowerCase().includes(searchStudent.toLowerCase()) &&
-        !selectedEvent.students.some(s => s._id === student._id)
+        !selectedEvent?.students?.some(s => s._id === student._id)
     );
 
     const filteredTeachers = allTeachers.filter(teacher =>
         teacher.fullName?.toLowerCase().includes(searchTeacher.toLowerCase()) &&
-        !selectedEvent.teachers.some(t => t._id === teacher._id)
+        !selectedEvent?.teachers?.some(t => t._id === teacher._id)
     );
 
     const handleFormClick = () => {
@@ -86,10 +108,10 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
         setIsTeacherListOpen(false);
     };
 
-    if (!isOpen) return null;
+    if (!isOpen || !selectedEvent) return null;
 
     return (
-        <div className={`modal ${isOpen ? "active" : ""}`} onClick={onClose}>
+        <div className={`modal ${isOpen ? "active" : ""}`} onClick={handleClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">Редактирование мероприятия</h2>
                 <div className="modal-form" onClick={handleFormClick}>
@@ -131,6 +153,36 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
                             className="form-input"
                             value={selectedEvent?.place || ""}
                             onChange={(e) => onChange({ ...selectedEvent, place: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Город</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={selectedEvent?.city || ""}
+                            onChange={(e) => onChange({ ...selectedEvent, city: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Ответственный за проведение</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={selectedEvent?.responsiblePerson || ""}
+                            onChange={(e) => onChange({ ...selectedEvent, responsiblePerson: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Контактное лицо</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={selectedEvent?.contactPerson || ""}
+                            onChange={(e) => onChange({ ...selectedEvent, contactPerson: e.target.value })}
                         />
                     </div>
 
@@ -245,12 +297,11 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
                         </div>
                     </div>
                 </div>
-
                 <div className="modal-buttons">
                     <button className="modal-button modal-button-primary" onClick={onSave}>
                         Сохранить
                     </button>
-                    <button className="modal-button modal-button-secondary" onClick={onClose}>
+                    <button className="modal-button modal-button-secondary" onClick={handleClose}>
                         Отмена
                     </button>
                 </div>

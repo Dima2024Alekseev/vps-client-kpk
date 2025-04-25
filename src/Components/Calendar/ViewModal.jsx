@@ -38,6 +38,27 @@ const ViewModal = ({ isOpen, onClose, selectedEvent, eventImages }) => {
                     </div>
 
                     <div className="form-group">
+                        <label className="form-label">Город</label>
+                        <div className="form-input info-text">
+                            {selectedEvent?.city || "Не указано"}
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Ответственный за проведение</label>
+                        <div className="form-input info-text">
+                            {selectedEvent?.responsiblePerson || "Не указано"}
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Контактное лицо</label>
+                        <div className="form-input info-text">
+                            {selectedEvent?.contactPerson || "Не указано"}
+                        </div>
+                    </div>
+
+                    <div className="form-group">
                         <label className="form-label">Организатор</label>
                         <div className="form-input info-text">
                             {selectedEvent?.organizer || "Не указан"}

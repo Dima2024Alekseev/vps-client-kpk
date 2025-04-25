@@ -1,4 +1,15 @@
 /* Основные стили для страницы */
+.error-message {
+  color: #d32f2f; /* Красный цвет для текста ошибки */
+  background-color: #fde8e8; /* Светлый фон для контраста */
+  padding: 10px 15px; /* Внутренние отступы */
+  border-radius: 6px; /* Скругленные углы */
+  margin-bottom: 20px; /* Отступ снизу */
+  font-size: 14px; /* Размер шрифта */
+  border-left: 4px solid #d32f2f; /* Левая граница для акцента */
+}
+
+
 .student-page {
   display: flex;
   justify-content: center;
