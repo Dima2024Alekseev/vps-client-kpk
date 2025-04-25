@@ -111,7 +111,6 @@ const ExcelExporter = {
         // Генерируем имя файла
         const fileName = `Студенты_${directionName}_${groupName}_${new Date().toLocaleDateString()}.xlsx`;
 
-        // Сохраняем файл
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const link = document.createElement('a');

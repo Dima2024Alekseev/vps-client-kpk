@@ -11,7 +11,6 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Проверяем, авторизован ли пользователь при монтировании компонента
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -22,7 +21,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Валидация полей
     if (!username.trim() || !password.trim()) {
       toast.error("Заполните все поля");
       return;
@@ -45,13 +43,11 @@ const Login = () => {
         throw new Error(data.error || "Ошибка при авторизации");
       }
 
-      // Сохраняем данные
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       toast.success("Авторизация успешна!");
 
-      // Перенаправляем с задержкой для отображения toast
       setTimeout(() => navigate("/home"), 1000);
 
     } catch (error) {
@@ -95,7 +91,6 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-              // minLength={6}
               />
             </div>
             <button

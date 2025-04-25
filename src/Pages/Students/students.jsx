@@ -178,7 +178,10 @@ const Students = () => {
     setCurrentPage(1);
   }, [filteredStudents.length, selectedDirection, selectedGroup, searchQuery]);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0 });
+  };
 
   const requestSort = (key) => {
     let direction = "asc";
@@ -226,6 +229,7 @@ const Students = () => {
 
   const handleSaveNewStudent = async () => {
     try {
+      console.log("Отправляемые данные:", newStudent); // Логирование данных
       const response = await fetch("http://localhost:5000/api/students", {
         method: "POST",
         headers: {
@@ -255,6 +259,7 @@ const Students = () => {
       alert(err.message);
     }
   };
+
 
   const handleEditStudent = (student) => {
     setSelectedStudent(student);
@@ -366,59 +371,59 @@ const Students = () => {
             <div className="student-page-body-header">
               <div className="student-list-page">
                 <div className="calendar-search-container">
-                <div className="input-icon-container">
-                  <img src={search} alt="search" />
+                  <div className="input-icon-container">
+                    <img src={search} alt="search" />
+                  </div>
+                  <input
+                    type="text"
+                    className="calendar-search-input"
+                    placeholder="Поиск"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                  />
                 </div>
-                <input
-                  type="text"
-                  className="calendar-search-input"
-                  placeholder="Поиск"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                />
-              </div>
-              <select
-                className="select"
-                value={selectedDirection}
-                onChange={handleDirectionChange}
-              >
-                {directions.map((direction) => (
-                  <option key={direction._id} value={direction._id}>
-                    {direction.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="select"
-                value={selectedGroup}
-                onChange={handleGroupChange}
-                disabled={!selectedDirection}
-              >
-                <option value="">Все группы</option>
-                {getFilteredGroups().map((group) => (
-                  <option key={group._id} value={group._id}>
-                    {group.name}
-                  </option>
-                ))}
-              </select>
+                <select
+                  className="select"
+                  value={selectedDirection}
+                  onChange={handleDirectionChange}
+                >
+                  {directions.map((direction) => (
+                    <option key={direction._id} value={direction._id}>
+                      {direction.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="select"
+                  value={selectedGroup}
+                  onChange={handleGroupChange}
+                  disabled={!selectedDirection}
+                >
+                  <option value="">Все группы</option>
+                  {getFilteredGroups().map((group) => (
+                    <option key={group._id} value={group._id}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="block-student-actions">
                 <button
-                className="add-btn-st"
-                onClick={() => setIsAddModalOpen(true)}
-              >
-                <FaUserPlus className="add-icon" /> Добавить
-              </button>
-              <button
-                className="export-btn"
-                onClick={exportToExcel}
-                disabled={filteredStudents.length === 0}
-                title="Экспорт в Excel"
-              >
-                <FaFileExcel className="excel-icon" /> Экспорт
-              </button>
+                  className="add-btn-st"
+                  onClick={() => setIsAddModalOpen(true)}
+                >
+                  <FaUserPlus className="add-icon" /> Добавить
+                </button>
+                <button
+                  className="export-btn"
+                  onClick={exportToExcel}
+                  disabled={filteredStudents.length === 0}
+                  title="Экспорт в Excel"
+                >
+                  <FaFileExcel className="excel-icon" /> Экспорт
+                </button>
               </div>
-              
+
             </div>
             <div className="student-page-body-header-title-container">
               <div className="student-page-body-header-title">

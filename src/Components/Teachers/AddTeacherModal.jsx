@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 const AddTeacherModal = ({ isOpen, onClose, newTeacher, onChange, onSave, departments }) => {
     const initialTeacherState = {
@@ -34,13 +35,14 @@ const AddTeacherModal = ({ isOpen, onClose, newTeacher, onChange, onSave, depart
             ...prev,
             [name]: value
         }));
+        onChange(e); // Синхронизация состояния с родительским компонентом
     };
 
     const handleKeyPress = (e) => {
         // Блокировка недопустимых символов при вводе (только для ФИО)
         const name = e.target.name;
         if (name === "lastName" || name === "firstName" || name === "middleName") {
-            if (!/^[А-Яа-яЁё\s]$/.test(e.key)) {
+            if (!/^[А-Яа-яЁё\s]*$/.test(e.key)) {
                 e.preventDefault();
             }
         }
@@ -48,12 +50,14 @@ const AddTeacherModal = ({ isOpen, onClose, newTeacher, onChange, onSave, depart
 
     const handleSave = () => {
         // Проверка обязательных полей
-        if (!localTeacher.lastName || !localTeacher.firstName) {
-            setError("Фамилия и имя обязательны для заполнения");
+        if (!localTeacher.lastName || !localTeacher.firstName || !localTeacher.department) {
+            setError("Фамилия, имя и ПЦК обязательны для заполнения");
             return;
         }
 
+        console.log("Сохраняемые данные:", localTeacher); // Логирование данных
         onSave(localTeacher);
+        toast.success("Преподаватель успешно добавлен!"); // Отображение уведомления
         handleClose();
     };
 
@@ -103,11 +107,12 @@ const AddTeacherModal = ({ isOpen, onClose, newTeacher, onChange, onSave, depart
                     />
                 </div>
                 <div className="form-group">
-                    <label>ПЦК</label>
+                    <label>ПЦК*</label>
                     <select
                         name="department"
                         value={localTeacher.department}
                         onChange={handleChange}
+                        required
                     >
                         <option value="">Выберите ПЦК</option>
                         {departments.map((department) => (

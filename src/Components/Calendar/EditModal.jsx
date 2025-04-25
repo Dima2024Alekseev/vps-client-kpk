@@ -36,7 +36,6 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
 
     useEffect(() => {
         if (selectedEvent) {
-            // Сохраняем начальные данные при получении selectedEvent
             setInitialEventData({
                 ...selectedEvent,
                 students: [...selectedEvent.students],
@@ -46,7 +45,6 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
     }, [selectedEvent]);
 
     const handleClose = () => {
-        // Сбрасываем все изменения к начальным данным
         if (initialEventData) {
             onChange(initialEventData);
         }

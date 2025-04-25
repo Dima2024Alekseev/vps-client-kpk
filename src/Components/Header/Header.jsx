@@ -1,4 +1,5 @@
 import React from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../Header/header.css";
 import logo from "../../img/logo.svg";
 import home from "../../img/home.svg";
@@ -8,28 +9,24 @@ import teachers from "../../img/teachers.svg";
 import statistics from "../../img/statistics.svg";
 import setting from "../../img/setting.svg";
 import logout from "../../img/logout.svg";
-import { Link, useLocation, useNavigate } from "react-router-dom"; // Добавляем useNavigate
+
 
 const Header = () => {
     const location = useLocation();
-    const navigate = useNavigate(); // Хук для навигации
+    const navigate = useNavigate();
 
-    // Функция для выхода из учетной записи
     const handleLogout = () => {
         const userData = localStorage.getItem("user");
 
         if (userData) {
-            // Если пользователь авторизован, показываем диалоговое окно с подтверждением
             const confirmLogout = window.confirm("Вы точно хотите выйти?");
             if (confirmLogout) {
-                // Удаляем данные из localStorage
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
                 navigate("/home"); // Перенаправляем на страницу /home
                 window.location.reload(); // Обновляем страницу
             }
         } else {
-            // Если пользователь не авторизован, перенаправляем на страницу авторизации
             navigate("/login");
         }
     };
@@ -78,9 +75,9 @@ const Header = () => {
                         <li className="nav-menu-item logout">
                             <div
                                 className="link"
-                                onClick={handleLogout} // Обработчик для выхода
+                                onClick={handleLogout}
                                 title="Выйти"
-                                style={{ cursor: "pointer" }} // Добавляем курсор для интерактивности
+                                style={{ cursor: "pointer" }}
                             >
                                 <img src={logout} alt="Logout" />
                             </div>

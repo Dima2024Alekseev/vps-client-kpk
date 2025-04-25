@@ -7,10 +7,9 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
     const [searchTeacher, setSearchTeacher] = useState("");
     const [isStudentListOpen, setIsStudentListOpen] = useState(false);
     const [isTeacherListOpen, setIsTeacherListOpen] = useState(false);
-    const [isStudentFieldClicked, setIsStudentFieldClicked] = useState(false); // New state variable
-    const [isTeacherFieldClicked, setIsTeacherFieldClicked] = useState(false); // New state variable
+    const [isStudentFieldClicked, setIsStudentFieldClicked] = useState(false);
+    const [isTeacherFieldClicked, setIsTeacherFieldClicked] = useState(false);
 
-    // Начальное состояние для сброса
     const initialEventState = {
         title: "",
         date: "",
@@ -47,7 +46,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
             onChange({ ...newEvent, students: [...newEvent.students, student] });
         }
         setIsStudentListOpen(false);
-        setSearchStudent(""); // Очищаем поиск после добавления
+        setSearchStudent("");
     };
 
     const handleRemoveStudent = (studentId) => {
@@ -59,7 +58,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
             onChange({ ...newEvent, teachers: [...newEvent.teachers, teacher] });
         }
         setIsTeacherListOpen(false);
-        setSearchTeacher(""); // Очищаем поиск после добавления
+        setSearchTeacher("");
     };
 
     const handleRemoveTeacher = (teacherId) => {
@@ -67,18 +66,13 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
     };
 
     const handleClose = () => {
-        // Сбрасываем все поля к начальным значениям
         onChange(initialEventState);
-        // Очищаем поисковые запросы
         setSearchStudent("");
         setSearchTeacher("");
-        // Закрываем списки
         setIsStudentListOpen(false);
         setIsTeacherListOpen(false);
-        // Сбрасываем состояние кликов
         setIsStudentFieldClicked(false);
         setIsTeacherFieldClicked(false);
-        // Вызываем оригинальный onClose
         onClose();
     };
 
@@ -95,8 +89,8 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
     const handleFormClick = () => {
         setIsStudentListOpen(false);
         setIsTeacherListOpen(false);
-        setIsStudentFieldClicked(false); // Сбрасываем состояние кликов
-        setIsTeacherFieldClicked(false); // Сбрасываем состояние кликов
+        setIsStudentFieldClicked(false);
+        setIsTeacherFieldClicked(false);
     };
 
     if (!isOpen) return null;
@@ -228,7 +222,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setIsStudentListOpen(true);
-                                    setIsStudentFieldClicked(true); // Устанавливаем состояние клика
+                                    setIsStudentFieldClicked(true);
                                 }}
                             />
                         </div>
@@ -242,7 +236,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 ))}
                             </div>
                         )}
-                        {isStudentFieldClicked && ( // Условный рендеринг
+                        {isStudentFieldClicked && (
                             <div className="selected-student-list">
                                 {newEvent.students.map((student) => (
                                     <div key={student._id} className="selected-student-item">
@@ -266,7 +260,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setIsTeacherListOpen(true);
-                                    setIsTeacherFieldClicked(true); // Устанавливаем состояние клика
+                                    setIsTeacherFieldClicked(true);
                                 }}
                             />
                         </div>
@@ -280,7 +274,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                 ))}
                             </div>
                         )}
-                        {isTeacherFieldClicked && ( // Условный рендеринг
+                        {isTeacherFieldClicked && (
                             <div className="selected-teacher-list">
                                 {newEvent.teachers.map((teacher) => (
                                     <div key={teacher._id} className="selected-teacher-item">

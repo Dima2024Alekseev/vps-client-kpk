@@ -105,7 +105,10 @@ const Teachers = () => {
         setCurrentPage(1);
     }, [filteredTeachers.length, selectedDepartment, searchQuery]);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0 });
+    };
 
     const requestSort = (key) => {
         let direction = "asc";
@@ -263,9 +266,9 @@ const Teachers = () => {
                                     ))}
                                 </select>
                                 <button className="add-btn-teacher" onClick={() => setIsAddModalOpen(true)}>
-                                     <FaUserPlus className="add-icon" />
-                                      Добавить
-                                   
+                                    <FaUserPlus className="add-icon" />
+                                    Добавить
+
                                 </button>
                                 <button
                                     className="export-btn"

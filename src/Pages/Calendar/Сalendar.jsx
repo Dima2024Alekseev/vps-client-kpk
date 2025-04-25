@@ -99,10 +99,8 @@ const Calendar = () => {
             });
         };
 
-        // Проверяем каждую минуту
         const interval = setInterval(checkUpcomingEvents, 60000);
 
-        // Первая проверка сразу при загрузке
         checkUpcomingEvents();
 
         return () => clearInterval(interval);
@@ -127,7 +125,10 @@ const Calendar = () => {
     const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
     const currentEvents = sortedEvents.slice(indexOfFirstEvent, indexOfLastEvent);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0 });
+    };
 
     const handleEditClick = (event) => {
         setSelectedEvent(event);

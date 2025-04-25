@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 const AddStudentModal = ({
   isOpen,
@@ -21,7 +22,6 @@ const AddStudentModal = ({
     studentId: ""
   });
 
-  // Синхронизируем локальное состояние с пропсами при открытии модального окна
   useEffect(() => {
     if (isOpen) {
       setLocalStudent(newStudent || {
@@ -35,29 +35,23 @@ const AddStudentModal = ({
     }
   }, [isOpen, newStudent]);
 
-  // Находим выбранное направление
   const selectedDirection = directions.find((dir) => dir._id === selectedSpecialty);
 
-  // Фильтруем группы, связанные с выбранным направлением
   const filteredGroups = selectedDirection
     ? groups.filter((group) => selectedDirection.groups.includes(group._id))
     : groups;
 
-  // Сортируем группы по возрастанию (по имени)
   const sortedGroups = filteredGroups.sort((a, b) => a.name.localeCompare(b.name));
 
-  // Функция для предотвращения ввода недопустимых символов
   const preventInvalidInput = (event) => {
     if (!/^[А-Яа-я\s]*$/.test(event.key)) {
       event.preventDefault();
     }
   };
 
-  // Обработчик изменений
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Проверка на наличие недопустимых символов
     if (name === "lastName" || name === "firstName" || name === "middleName") {
       if (!/^[А-Яа-я\s]*$/.test(value)) {
         setError("Имя, фамилия и отчество могут содержать только русские буквы и пробелы");
@@ -66,23 +60,24 @@ const AddStudentModal = ({
     }
 
     setLocalStudent(prev => ({ ...prev, [name]: value }));
+    onChange(e); // Синхронизация состояния с родительским компонентом
     setError("");
   };
 
   const handleSave = () => {
-    // Валидация перед сохранением
     if (!localStudent.lastName || !localStudent.firstName || !localStudent.specialty ||
       !localStudent.group || !localStudent.studentId) {
       setError("Заполните все обязательные поля");
       return;
     }
 
+    console.log("Сохраняемые данные:", localStudent); // Логирование данных
     onSave(localStudent);
+    toast.success("Студент успешно добавлен!"); // Отображение уведомления
     handleClose();
   };
 
   const handleClose = () => {
-    // Сбрасываем форму к начальным значениям
     setLocalStudent({
       lastName: "",
       firstName: "",
@@ -103,7 +98,6 @@ const AddStudentModal = ({
         <h2>Добавить студента</h2>
         {error && <div className="error-message">{error}</div>}
         <div className="add-student-form">
-          {/* Все поля формы используют localStudent */}
           <div className="add-student-form-group">
             <label>Фамилия*</label>
             <input

@@ -56,7 +56,6 @@
   margin-bottom: 41px;
 }
 
-/* Стили элементов событий */
 .events-item {
   display: flex;
   align-items: center;
@@ -143,7 +142,6 @@
   cursor: pointer;
 }
 
-/* Стили пагинации */
 .calendar-page-content-footer {
   display: flex;
   justify-content: space-between;
@@ -275,8 +273,6 @@
   background-color: #0355b0;
 }
 
-
-/* Стили модальных окон */
 .modal {
   display: none;
   position: fixed;
@@ -375,7 +371,6 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Стили форм */
 .modal-form {
   display: flex;
   flex-direction: column;

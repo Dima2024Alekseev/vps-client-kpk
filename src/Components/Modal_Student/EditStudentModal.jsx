@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import "../../Pages/Students/student.css";
 
 const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions }) => {
@@ -71,6 +72,7 @@ const EditStudentModal = ({ isOpen, onClose, student, onSave, groups, directions
 
     try {
       await onSave(formData);
+      toast.success("Изменения успешно сохранены!"); // Отображение уведомления
       handleClose();
     } catch (err) {
       console.error("Ошибка при сохранении:", err);

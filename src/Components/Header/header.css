@@ -32,19 +32,18 @@
   gap: 80px;
 }
 
-/* Стили для иконок */
 .nav-menu-item .link img {
-  opacity: 0.6; /* Иконки по умолчанию тусклые */
+  opacity: 0.6;
   transition: opacity 0.3s ease;
   width: 35px;
   height: auto;
 }
 
 .nav-menu-item .link.active img {
-  opacity: 1; /* Активная иконка ярче */
-  filter: brightness(2); /* Делаем её ещё ярче */
+  opacity: 1; 
+  filter: brightness(2);
 }
 
 .nav-menu-item .link:hover img {
-  opacity: 1; /* При наведении иконка становится ярче */
+  opacity: 1;
 }

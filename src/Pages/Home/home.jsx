@@ -232,7 +232,6 @@ const Home = () => {
     );
   };
 
-  // Фильтрация мероприятий для отображения
   const eventsThisMonth = eventsData.filter((event) => {
     const eventDate = new Date(event.date);
     return (
@@ -269,7 +268,6 @@ const Home = () => {
       <div className="home-page">
         <Header />
         <div className="home-page-content">
-          {/* Левая колонка */}
           <div className="home-page-content-left-side">
             <div className="user-profile">
               <div className="user-profile-left-side">
@@ -316,8 +314,6 @@ const Home = () => {
               </div>
             </div>
           </div>
-
-          {/* Правая колонка */}
           <div className="home-page-content-right-side">
             <div className="home-page-content-right-side-header">
               <div className="search-container">

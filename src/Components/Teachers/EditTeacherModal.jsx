@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 const EditTeacherModal = ({ isOpen, onClose, teacher, onSave, departments }) => {
     const [editedTeacher, setEditedTeacher] = useState(teacher || {});
@@ -45,6 +46,8 @@ const EditTeacherModal = ({ isOpen, onClose, teacher, onSave, departments }) => 
         }
 
         onSave(editedTeacher);
+        toast.success("Изменения успешно сохранены!"); // Отображение уведомления
+        onClose();
     };
 
     if (!isOpen) return null;
