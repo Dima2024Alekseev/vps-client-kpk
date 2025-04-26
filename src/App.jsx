@@ -86,7 +86,11 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={
+            <ProtectedRoute isAdmin>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
         </Routes>
       </EventsProvider>
     </Router>

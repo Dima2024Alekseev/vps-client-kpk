@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "./login.css";
-import { Helmet } from "react-helmet";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import logo_auth from "../../img/logo-auth.svg";
+import "./login.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -43,7 +42,7 @@ const Login = () => {
         throw new Error(data.error || "Ошибка при авторизации");
       }
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.accessToken);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       toast.success("Авторизация успешна!");
@@ -60,9 +59,6 @@ const Login = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Авторизация</title>
-      </Helmet>
       <main className="auth-main-container">
         <div className="left-side-auth">
           <div className="left-side-auth-logo-container">
