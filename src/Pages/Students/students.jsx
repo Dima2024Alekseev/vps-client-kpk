@@ -9,9 +9,8 @@ import studentPage from "../../img/studentPage/profile-2user.svg";
 import save from "../../img/studentPage/save.svg";
 import search from "../../img/search-icon.svg";
 import { FaFileExcel, FaUserPlus } from 'react-icons/fa';
+import { GrDocumentExcel } from "react-icons/gr";
 import StudentInfoModal from "../../Components/Modal_Student/StudentInfoModal";
-import ActivityModal from "../../Components/Modal_Student/ActivityModal";
-import ActivityFilterModal from "../../Components/Modal_Student/ActivityFilterModal";
 import EditStudentModal from "../../Components/Modal_Student/EditStudentModal";
 import AddStudentModal from "../../Components/Modal_Student/AddStudentModal";
 import Pagination from "../../Components/Pagination";
@@ -23,8 +22,6 @@ const Students = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [currentGroupName, setCurrentGroupName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
-  const [isActivityFilterModalOpen, setIsActivityFilterModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newStudent, setNewStudent] = useState({
@@ -318,6 +315,37 @@ const Students = () => {
     }
   };
 
+  const exportStudent = async (student) => {
+    try {
+      // Загружаем все мероприятия
+      const response = await fetch('http://localhost:5000/api/events');
+      if (!response.ok) throw new Error("Ошибка при загрузке мероприятий");
+      const allEvents = await response.json();
+
+      // Фильтруем мероприятия для текущего студента
+      const studentEvents = allEvents.filter(event =>
+        event.students.some(s => s._id === student._id)
+      );
+
+      // Форматируем данные мероприятий
+      const formattedEvents = studentEvents.map(event => ({
+        title: event.title,
+        date: event.date,
+        time: event.time,
+        place: event.place,
+        organizer: event.organizer,
+        city: event.city,
+        responsiblePerson: event.responsiblePerson
+      }));
+
+      // Вызываем экспорт с количеством мероприятий
+      await ExcelExporter.exportStudentDetails(student, formattedEvents);
+
+    } catch (err) {
+      console.error("Ошибка при экспорте студента:", err);
+      alert("Не удалось экспортировать данные студента");
+    }
+  };
   // Функция для экспорта в Excel
   const exportToExcel = async () => {
     try {
@@ -474,11 +502,22 @@ const Students = () => {
                           </button>
                           <button
                             className="icon-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              exportStudent(student);
+                            }}
+                            title="Экспорт в Excel"
+                          >
+                            <GrDocumentExcel color="#044382" alt="Экспорт" className="action-icon" />
+                          </button>
+                          <button
+                            className="icon-btn"
                             onClick={() => handleDeleteStudent(student._id)}
                             title="Удалить"
                           >
                             <img src={delete_} alt="Удалить" className="action-icon" />
                           </button>
+
                         </td>
                       </tr>
                     ))
@@ -506,22 +545,8 @@ const Students = () => {
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
               onEdit={() => setIsEditModalOpen(true)}
-              onActivity={() => setIsActivityModalOpen(true)}
               student={selectedStudent}
               events={studentEvents}
-            />
-
-            <ActivityModal
-              isOpen={isActivityModalOpen}
-              onClose={() => setIsActivityModalOpen(false)}
-              onFilter={() => setIsActivityFilterModalOpen(true)}
-              student={selectedStudent}
-              events={studentEvents}
-            />
-
-            <ActivityFilterModal
-              isOpen={isActivityFilterModalOpen}
-              onClose={() => setIsActivityFilterModalOpen(false)}
             />
 
             <EditStudentModal

@@ -84,13 +84,13 @@ const ExcelExporter = {
             ]);
 
             const LastNameStudentsCell = newRow.getCell('A');
-            LastNameStudentsCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            LastNameStudentsCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
 
             const NameStudentsCell = newRow.getCell('B');
-            NameStudentsCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            NameStudentsCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
 
             const SurNameStudentsCell = newRow.getCell('C');
-            SurNameStudentsCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            SurNameStudentsCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
 
             const GroupStudentsCell = newRow.getCell('D');
             GroupStudentsCell.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -242,17 +242,17 @@ const ExcelExporter = {
             ]);
 
             const LastnameTeachersCell = newRow.getCell('A');
-            LastnameTeachersCell.alignment = { vertical: "middle", horizontal: 'center' };
+            LastnameTeachersCell.alignment = { vertical: "middle", horizontal: 'center', wrapText: true };
 
             const NameTeachersCell = newRow.getCell('B');
-            NameTeachersCell.alignment = { vertical: "middle", horizontal: 'center' };
+            NameTeachersCell.alignment = { vertical: "middle", horizontal: 'center', wrapText: true };
 
             const SurnameTeachersCell = newRow.getCell('C');
-            SurnameTeachersCell.alignment = { vertical: "middle", horizontal: 'center' };
+            SurnameTeachersCell.alignment = { vertical: "middle", horizontal: 'center', wrapText: true };
 
             // Применяем выравнивание для столбца с ПЦК
             const departmentCell = newRow.getCell('D');
-            departmentCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            departmentCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
 
             // Настройка стиля для ячейки с количеством мероприятий
             const countCell = newRow.getCell('E');
@@ -285,6 +285,144 @@ const ExcelExporter = {
         const fileName = `Преподаватели_${departmentName}_${new Date().toLocaleDateString()}.xlsx`;
 
         // Сохраняем файл
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    },
+
+    // Добавляем новый метод в объект ExcelExporter
+    exportStudentDetails: async (student, events) => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Студент');
+
+        // 1. Заголовок с информацией о направлении и группе
+        const directionInfo = `Направление: ${student.specialty?.name || 'ИСиП'} (${student.specialty?.description || 'Информационные системы и программирование'}), Группа: ${student.group?.name || ''}`;
+        worksheet.addRow([directionInfo]);
+        worksheet.mergeCells('A1:G1');
+
+        // Стиль для заголовка направления
+        const directionRow = worksheet.getRow(1);
+        directionRow.eachCell((cell) => {
+            cell.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+        });
+
+        // 2. Таблица с данными студента
+        const studentHeaders = ['Фамилия', 'Имя', 'Отчество', 'Группа', 'Специальность', 'Номер студ. билета', 'Кол-во мероприятий'];
+
+        worksheet.addRow(studentHeaders);
+
+        // Стиль для заголовков студента
+        const studentHeaderRow = worksheet.getRow(2);
+        studentHeaderRow.eachCell((cell) => {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+
+        // Данные студента
+        const studentDataRow = worksheet.addRow([
+            student.lastName || '',
+            student.firstName || '',
+            student.middleName || '',
+            student.group?.name || '',
+            student.specialty?.name || '',
+            student.studentId || '',
+            events.length
+        ]);
+
+        // Стиль для данных студента
+        studentDataRow.eachCell((cell) => {
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+
+        // 3. Таблица с мероприятиями
+        worksheet.addRow([]); // Пустая строка разделитель
+
+        // Заголовок "Мероприятия студента"
+        worksheet.addRow(['Мероприятия студента']);
+        worksheet.mergeCells('A5:G5');
+        const eventsTitleRow = worksheet.getRow(5);
+        eventsTitleRow.eachCell((cell) => {
+            cell.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+        });
+
+        // Заголовки таблицы мероприятий
+        const eventHeaders = ['Название', 'Дата', 'Время', 'Место', 'Организатор', 'Город', 'Ответственный'];
+        worksheet.addRow(eventHeaders);
+
+        // Стиль для заголовков мероприятий (синий фон, белый текст, границы)
+        const eventHeaderRow = worksheet.getRow(6);
+        eventHeaderRow.eachCell((cell) => {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+
+        // Данные мероприятий (центрированные, с границами)
+        events.forEach(event => {
+            const eventRow = worksheet.addRow([
+                event.title || '',
+                event.date || '',
+                event.time || '',
+                event.place || '',
+                event.organizer || '',
+                event.city || '',
+                event.responsiblePerson || ''
+            ]);
+
+            // Стиль для данных мероприятий
+            eventRow.eachCell((cell) => {
+                cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                cell.border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                };
+            });
+        });
+
+        // Настройка ширины столбцов
+        worksheet.columns = [
+            { width: 35 }, // Название
+            { width: 15 }, // Дата
+            { width: 15 }, // Время
+            { width: 20 }, // Место
+            { width: 20 }, // Организатор
+            { width: 20 }, // Город
+            { width: 20 }  // Ответственный
+        ];
+
+
+
+        // Генерация и скачивание файла
+        const fileName = `Студент_${student.lastName}_${student.firstName}.xlsx`;
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const link = document.createElement('a');
