@@ -11,6 +11,7 @@ import EditTeacherModal from "../../Components/Teachers/EditTeacherModal";
 import Pagination from "../../Components/Pagination";
 import ExcelExporter from "../../utils/ExcelExporter";
 import { FaFileExcel, FaUserPlus } from 'react-icons/fa';
+import { GrDocumentExcel } from "react-icons/gr";
 
 const Teachers = () => {
     const [departments, setDepartments] = useState([]);
@@ -230,6 +231,26 @@ const Teachers = () => {
         }
     };
 
+    const exportTeacher = async (teacher) => {
+        try {
+            // Загружаем все мероприятия
+            const response = await fetch('http://localhost:5000/api/events?populate=teachers');
+            if (!response.ok) throw new Error("Ошибка при загрузке мероприятий");
+            const allEvents = await response.json();
+
+            // Фильтруем мероприятия для текущего преподавателя
+            const teacherEvents = allEvents.filter(event =>
+                event.teachers.some(t => t._id === teacher._id)
+            );
+
+            // Вызываем экспорт
+            await ExcelExporter.exportTeacherDetails(teacher, teacherEvents);
+        } catch (err) {
+            console.error("Ошибка при экспорте преподавателя:", err);
+            alert("Не удалось экспортировать данные преподавателя");
+        }
+    };
+
     return (
         <>
             <Helmet>
@@ -268,7 +289,6 @@ const Teachers = () => {
                                 <button className="add-btn-teacher" onClick={() => setIsAddModalOpen(true)}>
                                     <FaUserPlus className="add-icon" />
                                     Добавить
-
                                 </button>
                                 <button
                                     className="export-btn"
@@ -317,11 +337,22 @@ const Teachers = () => {
                                                     </button>
                                                     <button
                                                         className="icon-btn"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            exportTeacher(teacher);
+                                                        }}
+                                                        title="Экспорт в Excel"
+                                                    >
+                                                        <GrDocumentExcel color="#044382" className="action-icon" />
+                                                    </button>
+                                                    <button
+                                                        className="icon-btn"
                                                         onClick={() => handleDeleteTeacher(teacher._id)}
                                                         title="Удалить"
                                                     >
                                                         <img src={delete_} alt="Удалить" className="action-icon" />
                                                     </button>
+
                                                 </td>
                                             </tr>
                                         ))

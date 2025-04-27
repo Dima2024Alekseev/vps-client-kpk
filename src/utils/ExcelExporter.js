@@ -430,6 +430,138 @@ const ExcelExporter = {
         link.download = fileName;
         link.click();
         URL.revokeObjectURL(link.href);
+    },
+
+    exportTeacherDetails: async (teacher, events) => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Преподаватель');
+
+        // 1. Заголовок с информацией о кафедре/ПЦК
+        const departmentInfo = `Преподаватель: ${teacher.department?.name || 'Не указано'}`;
+        worksheet.addRow([departmentInfo]);
+        worksheet.mergeCells('A1:E1');
+
+        // Стиль для заголовка
+        const headerRow = worksheet.getRow(1);
+        headerRow.eachCell((cell) => {
+            cell.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+        });
+
+        // 2. Таблица с данными преподавателя
+        const teacherHeaders = ['Фамилия', 'Имя', 'Отчество', 'ПЦК', 'Кол-во мероприятий'];
+        worksheet.addRow(teacherHeaders);
+
+        // Стиль для заголовков преподавателя
+        const teacherHeaderRow = worksheet.getRow(2);
+        teacherHeaderRow.eachCell((cell) => {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+
+        // Данные преподавателя
+        const teacherDataRow = worksheet.addRow([
+            teacher.lastName || '',
+            teacher.firstName || '',
+            teacher.middleName || '',
+            teacher.department?.name || '',
+            events.length
+        ]);
+
+        // Стиль для данных преподавателя
+        teacherDataRow.eachCell((cell) => {
+            cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+
+        // 3. Таблица с мероприятиями
+        worksheet.addRow([]); // Пустая строка разделитель
+
+        // Заголовок "Мероприятия преподавателя"
+        worksheet.addRow(['Мероприятия преподавателя']);
+        worksheet.mergeCells('A5:G5');
+        const eventsTitleRow = worksheet.getRow(5);
+        eventsTitleRow.eachCell((cell) => {
+            cell.font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+        });
+
+        // Заголовки таблицы мероприятий
+        const eventHeaders = ['Название', 'Дата', 'Время', 'Место', 'Организатор', 'Город', 'Ответственный'];
+        worksheet.addRow(eventHeaders);
+
+        // Стиль для заголовков мероприятий
+        const eventHeaderRow = worksheet.getRow(6);
+        eventHeaderRow.eachCell((cell) => {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+
+        // Данные мероприятий
+        events.forEach(event => {
+            const eventRow = worksheet.addRow([
+                event.title || '',
+                event.date || '',
+                event.time || '',
+                event.place || '',
+                event.organizer || '',
+                event.city || '',
+                event.responsiblePerson || ''
+            ]);
+
+            // Стиль для данных мероприятий
+            eventRow.eachCell((cell) => {
+                cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                cell.border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                };
+            });
+        });
+
+        // Настройка ширины столбцов
+        worksheet.columns = [
+            { width: 35 }, // Название
+            { width: 15 }, // Дата
+            { width: 15 }, // Время
+            { width: 30 }, // Место
+            { width: 20 }, // Организатор
+            { width: 20 }, // Город
+            { width: 20 }  // Ответственный
+        ];
+
+        // Генерация и скачивание файла
+        const fileName = `Преподаватель_${teacher.lastName}_${teacher.firstName}.xlsx`;
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(link.href);
     }
 
 };

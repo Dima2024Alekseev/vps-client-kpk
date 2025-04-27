@@ -52,6 +52,7 @@
     text-align: center;
     display: flex;
     align-items: center;
+    border: none;
 }
 
 .input-icon-container {
