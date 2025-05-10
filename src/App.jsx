@@ -38,7 +38,7 @@ const App = () => {
 
           {/* Защищенные маршруты */}
           <Route
-            path="/"
+            path="/home"
             element={
               <ProtectedRoute>
                 <Home />

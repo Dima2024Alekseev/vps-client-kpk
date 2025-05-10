@@ -13,7 +13,7 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate("/");
+      navigate("/home");
     }
   }, [navigate]);
 
@@ -47,7 +47,7 @@ const Login = () => {
 
       toast.success("Авторизация успешна!");
 
-      setTimeout(() => navigate("/"), 1000);
+      setTimeout(() => navigate("/home"), 1000);
 
     } catch (error) {
       console.error("Ошибка авторизации:", error);
