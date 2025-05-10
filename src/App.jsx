@@ -8,9 +8,8 @@ import Calendar from "./Pages/Calendar/Сalendar";
 import Students from "./Pages/Students/Students";
 import Teachers from "./Pages/Teachers/Teachers";
 import Statistics from "./Pages/Statistics/statistics";
-import Settings from "./Pages/Settings/settings";
+// import Settings from "./Pages/Settings/settings";
 import Login from "./Pages/Authorization/login";
-import ProfilePage from "./Pages/Profile/Profile";
 import ScrollToTop from "./Components/ScrollToTop";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import { EventsProvider } from "./Components/EventsContext";
@@ -78,19 +77,14 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          <Route
+          {/* <Route
             path="/settings"
             element={
               <ProtectedRoute isAdmin>
                 <Settings />
               </ProtectedRoute>
             }
-          />
-          <Route path="/profile" element={
-            <ProtectedRoute isAdmin>
-              <ProfilePage />
-            </ProtectedRoute>
-          } />
+          /> */}
         </Routes>
       </EventsProvider>
     </Router>

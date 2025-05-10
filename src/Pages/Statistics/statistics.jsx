@@ -2,14 +2,14 @@ import React from "react";
 import "./statistic.css";
 import { Helmet } from "react-helmet";
 import Header from "../../Components/Header/Header";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-const data = [
-  { name: 'ИСиП', 'Статистика активности': 8 },
-  { name: 'Нач. кл.', 'Статистика активности': 6 },
-  { name: 'Дошкол.', 'Статистика активности': 4 },
-  { name: 'Физ. кул.', 'Статистика активности': 2 },
-];
+// const data = [
+//     { name: 'ИСиП', 'Статистика активности': 8 },
+//     { name: 'Нач. кл.', 'Статистика активности': 6 },
+//     { name: 'Дошкол.', 'Статистика активности': 4 },
+//     { name: 'Физ. кул.', 'Статистика активности': 2 },
+// ];
 
 const Statistics = () => {
     return (
@@ -19,7 +19,7 @@ const Statistics = () => {
             </Helmet>
             <div className="statistic-page">
                 <Header />
-                <div className="statistic-page-content">
+                {/* <div className="statistic-page-content">
                     <div className="stat-left-side">
                         <div className="filter-stat">
                             <div className="filter-stat-title">Фильтр по активности:</div>
@@ -69,7 +69,7 @@ const Statistics = () => {
                             <Bar dataKey="Статистика активности" fill="#1E3A8A" barSize={80} />
                         </BarChart>
                     </div>
-                </div>
+                </div> */}
             </div>
         </>
     );

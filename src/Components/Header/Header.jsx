@@ -7,7 +7,7 @@ import calendar from "../../img/calendar.svg";
 import student from "../../img/student.svg";
 import teachers from "../../img/teachers.svg";
 import statistics from "../../img/statistics.svg";
-import setting from "../../img/setting.svg";
+// import setting from "../../img/setting.svg";
 import logout from "../../img/logout.svg";
 
 
@@ -65,11 +65,11 @@ const Header = () => {
                                 <img src={statistics} alt="Statistics" />
                             </Link>
                         </li>
-                        <li className="nav-menu-item">
+                        {/* <li className="nav-menu-item">
                             <Link to="/settings" className={`link ${location.pathname === "/settings" ? "active" : ""}`} title="Настройки">
                                 <img src={setting} alt="Settings" />
                             </Link>
-                        </li>
+                        </li> */}
                     </div>
                     <div>
                         <li className="nav-menu-item logout">

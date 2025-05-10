@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect, useCallback } from "react";
 import "./index.css";
-import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Header from "../../Components/Header/Header";
 import user from "../../img/user.svg";
@@ -344,9 +343,7 @@ const Home = () => {
                 <NotificationsDropdown />
               </div>
               <div className="home-page-content-right-side-header-item">
-                <Link to="/profile">
                   <img src={user_icon} alt="" />
-                </Link>
                 <img src={chevron} alt="" />
               </div>
             </div>
