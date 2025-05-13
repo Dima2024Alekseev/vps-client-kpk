@@ -55,10 +55,10 @@ const Students = () => {
         setError(null);
 
         const [directionsRes, groupsRes, studentsRes, eventsRes] = await Promise.all([
-          fetch("http://localhost:5000/api/directions"),
-          fetch("http://localhost:5000/api/groups"),
-          fetch("http://localhost:5000/api/students"),
-          fetch("http://localhost:5000/api/events")
+          fetch("/api/directions"),
+          fetch("/api/groups"),
+          fetch("/api/students"),
+          fetch("/api/events")
         ]);
 
         if (!directionsRes.ok || !groupsRes.ok || !studentsRes.ok || !eventsRes.ok) {
@@ -103,7 +103,7 @@ const Students = () => {
 
   const loadStudentEvents = async (studentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/students/${studentId}/events`);
+      const response = await fetch(`/api/students/${studentId}/events`);
       if (!response.ok) throw new Error("Ошибка при загрузке мероприятий студента");
       const events = await response.json();
       setStudentEvents(events);
@@ -227,7 +227,7 @@ const Students = () => {
   const handleSaveNewStudent = async () => {
     try {
       console.log("Отправляемые данные:", newStudent); // Логирование данных
-      const response = await fetch("http://localhost:5000/api/students", {
+      const response = await fetch("/api/students", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -266,7 +266,7 @@ const Students = () => {
   const handleSaveEditedStudent = async (updatedData) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/students/${selectedStudent._id}`,
+        `/api/students/${selectedStudent._id}`,
         {
           method: "PUT",
           headers: {
@@ -298,7 +298,7 @@ const Students = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/students/${studentId}`,
+        `/api/students/${studentId}`,
         {
           method: "DELETE",
         }
@@ -318,7 +318,7 @@ const Students = () => {
   const exportStudent = async (student) => {
     try {
       // Загружаем все мероприятия
-      const response = await fetch('http://localhost:5000/api/events');
+      const response = await fetch('/api/events');
       if (!response.ok) throw new Error("Ошибка при загрузке мероприятий");
       const allEvents = await response.json();
 

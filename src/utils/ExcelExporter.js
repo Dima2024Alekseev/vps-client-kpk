@@ -52,7 +52,7 @@ const ExcelExporter = {
         // Загружаем все мероприятия один раз
         let allEvents = [];
         try {
-            const response = await fetch('http://localhost:5000/api/events?populate=students');
+            const response = await fetch('/api/events?populate=students');
             if (response.ok) {
                 allEvents = await response.json();
             }
@@ -212,7 +212,7 @@ const ExcelExporter = {
         // Загружаем все мероприятия один раз
         let allEvents = [];
         try {
-            const response = await fetch('http://localhost:5000/api/events?populate=teachers');
+            const response = await fetch('/api/events?populate=teachers');
             if (response.ok) {
                 allEvents = await response.json();
             }

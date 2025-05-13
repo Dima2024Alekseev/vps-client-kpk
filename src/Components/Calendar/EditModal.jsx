@@ -12,7 +12,7 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/students");
+                const response = await fetch("/api/students");
                 const data = await response.json();
                 setAllStudents(data);
             } catch (error) {
@@ -22,7 +22,7 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
 
         const fetchTeachers = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/teachers");
+                const response = await fetch("/api/teachers");
                 const data = await response.json();
                 setAllTeachers(data);
             } catch (error) {

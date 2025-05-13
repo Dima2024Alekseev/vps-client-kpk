@@ -51,7 +51,7 @@ const Home = () => {
 
     const fetchDailyQuote = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/quotes/daily-quote");
+        const response = await fetch("/api/quotes/daily-quote");
         if (!response.ok) throw new Error("Ошибка при загрузке цитаты");
         const data = await response.json();
         setDailyQuote({ text: data.text, author: data.author });

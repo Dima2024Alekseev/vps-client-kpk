@@ -39,8 +39,8 @@ const Teachers = () => {
         const fetchData = async () => {
             try {
                 const [departmentsRes, teachersRes] = await Promise.all([
-                    fetch("http://localhost:5000/api/departments"),
-                    fetch("http://localhost:5000/api/teachers")
+                    fetch("/api/departments"),
+                    fetch("/api/teachers")
                 ]);
 
                 if (!departmentsRes.ok || !teachersRes.ok) {
@@ -133,7 +133,7 @@ const Teachers = () => {
 
     const handleSaveNewTeacher = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/teachers", {
+            const response = await fetch("/api/teachers", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -169,7 +169,7 @@ const Teachers = () => {
     const handleSaveEditedTeacher = async (updatedData) => {
         try {
             const response = await fetch(
-                `http://localhost:5000/api/teachers/${selectedTeacher._id}`,
+                `/api/teachers/${selectedTeacher._id}`,
                 {
                     method: "PUT",
                     headers: {
@@ -201,7 +201,7 @@ const Teachers = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/teachers/${teacherId}`,
+                `/api/teachers/${teacherId}`,
                 {
                     method: "DELETE",
                 }
@@ -234,7 +234,7 @@ const Teachers = () => {
     const exportTeacher = async (teacher) => {
         try {
             // Загружаем все мероприятия
-            const response = await fetch('http://localhost:5000/api/events?populate=teachers');
+            const response = await fetch('/api/events?populate=teachers');
             if (!response.ok) throw new Error("Ошибка при загрузке мероприятий");
             const allEvents = await response.json();
 

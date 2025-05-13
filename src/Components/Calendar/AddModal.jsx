@@ -26,13 +26,13 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
 
     useEffect(() => {
         const fetchStudents = async () => {
-            const response = await fetch("http://localhost:5000/api/students");
+            const response = await fetch("/api/students");
             const data = await response.json();
             setStudents(data);
         };
 
         const fetchTeachers = async () => {
-            const response = await fetch("http://localhost:5000/api/teachers");
+            const response = await fetch("/api/teachers");
             const data = await response.json();
             setTeachers(data);
         };

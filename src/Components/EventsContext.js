@@ -8,7 +8,7 @@ export const EventsProvider = ({ children }) => {
     // Функция для загрузки мероприятий
     const fetchEvents = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/events");
+            const response = await fetch("/api/events");
             const data = await response.json();
             setEventsData(data);
         } catch (error) {

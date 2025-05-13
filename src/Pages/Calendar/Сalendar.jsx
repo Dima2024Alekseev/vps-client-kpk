@@ -151,7 +151,7 @@ const Calendar = () => {
 
     const handleSaveEdit = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/events/${selectedEvent._id}`, {
+            const response = await fetch(`/api/events/${selectedEvent._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -172,7 +172,7 @@ const Calendar = () => {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/events/${selectedEvent._id}`, {
+            const response = await fetch(`/api/events/${selectedEvent._id}`, {
                 method: "DELETE",
             });
 
@@ -189,7 +189,7 @@ const Calendar = () => {
 
     const handleSaveNewEvent = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/events", {
+            const response = await fetch("/api/events", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
