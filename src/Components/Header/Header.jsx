@@ -7,7 +7,6 @@ import calendar from "../../img/calendar.svg";
 import student from "../../img/student.svg";
 import teachers from "../../img/teachers.svg";
 import statistics from "../../img/statistics.svg";
-// import setting from "../../img/setting.svg";
 import logout from "../../img/logout.svg";
 
 
@@ -23,7 +22,7 @@ const Header = () => {
             if (confirmLogout) {
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
-                navigate("/"); // Перенаправляем на страницу /home
+                navigate("/");
                 window.location.reload(); // Обновляем страницу
             }
         } else {
