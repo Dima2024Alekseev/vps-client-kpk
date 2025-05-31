@@ -24,6 +24,18 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
         teachers: []
     };
 
+    const imageTitles = {
+        "reshot-icon-student.svg": "Учебное мероприятие",
+        "online_concert_interaction.svg": "Концерт",
+        "calendar_event_star.svg": "Календарное событие",
+        "china_flag_icon.svg": "Китайская культура",
+        "game_jn91iitvfpln.svg": "Игровое мероприятие",
+        "group_3pfeaq1nm193.svg": "Групповое мероприятие",
+        "sport_71qlik1n211a.svg": "Спортивное событие",
+        "konferentsiya_rpbf1ei71xv3.svg": "Конференция",
+        "chess_ypvggyrc9o86.svg": "Шахматы / Интеллектуальные игры"
+    };
+
     useEffect(() => {
         const fetchStudents = async () => {
             const response = await fetch("/api/students");
@@ -195,6 +207,7 @@ const AddModal = ({ isOpen, onClose, newEvent, onChange, onSave, eventImages }) 
                                     <img
                                         src={imageSrc}
                                         alt={imageName}
+                                        title={imageTitles[imageName]}
                                         className={`image-preview ${newEvent.image === imageName ? "selected" : ""}`}
                                         onClick={() => onChange({ ...newEvent, image: imageName })}
                                     />

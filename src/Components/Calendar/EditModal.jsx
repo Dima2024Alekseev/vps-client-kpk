@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChange }) => {
+const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChange, eventImageTitles }) => {
     const [allStudents, setAllStudents] = useState([]);
     const [allTeachers, setAllTeachers] = useState([]);
     const [searchStudent, setSearchStudent] = useState("");
@@ -204,7 +204,7 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
                             <option value="">Выберите изображение</option>
                             {Object.keys(eventImages).map((imageName) => (
                                 <option key={imageName} value={imageName}>
-                                    {imageName}
+                                    {eventImageTitles[imageName] || imageName}
                                 </option>
                             ))}
                         </select>
@@ -212,11 +212,11 @@ const EditModal = ({ isOpen, onClose, selectedEvent, onSave, eventImages, onChan
                             <img
                                 src={eventImages[selectedEvent.image]}
                                 alt="Предпросмотр"
+                                title={eventImageTitles[selectedEvent.image]}
                                 className="image-preview"
                             />
                         )}
                     </div>
-
                     <div className="form-group">
                         <label className="form-label">Студенты</label>
                         <div className="input-with-button">

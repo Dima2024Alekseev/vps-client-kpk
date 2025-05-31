@@ -11,6 +11,11 @@ import delete_ from "../../img/delete.svg";
 import concert from "../../img/online_concert_interaction.svg";
 import events from "../../img/calendar_event_star.svg";
 import china from "../../img/china_flag_icon.svg";
+import game from "../../img/game_jn91iitvfpln.svg";
+import group from "../../img/group_3pfeaq1nm193.svg";
+import sport from "../../img/sport_71qlik1n211a.svg";
+import konferentsiya from "../../img/konferentsiya_rpbf1ei71xv3.svg";
+import chess from "../../img/chess_ypvggyrc9o86.svg";
 import Pagination from "../../Components/Pagination";
 import { EventsContext } from "../../Components/EventsContext";
 import EditModal from "../../Components/Calendar/EditModal";
@@ -46,16 +51,31 @@ const Calendar = () => {
         "online_concert_interaction.svg": concert,
         "calendar_event_star.svg": events,
         "china_flag_icon.svg": china,
+        "game_jn91iitvfpln.svg": game,
+        "group_3pfeaq1nm193.svg": group,
+        "sport_71qlik1n211a.svg": sport,
+        "konferentsiya_rpbf1ei71xv3.svg": konferentsiya,
+        "chess_ypvggyrc9o86.svg": chess,
     };
 
-    // Проверка предстоящих мероприятий
+    const eventImageTitles = {
+        "reshot-icon-student.svg": "Учебное мероприятие",
+        "online_concert_interaction.svg": "Концерт",
+        "calendar_event_star.svg": "Календарное событие",
+        "china_flag_icon.svg": "Китайская культура",
+        "game_jn91iitvfpln.svg": "Игровое мероприятие",
+        "group_3pfeaq1nm193.svg": "Групповое мероприятие",
+        "sport_71qlik1n211a.svg": "Спортивное событие",
+        "konferentsiya_rpbf1ei71xv3.svg": "Конференция",
+        "chess_ypvggyrc9o86.svg": "Шахматы / Интеллектуальные игры"
+    };
+
     useEffect(() => {
         const checkUpcomingEvents = () => {
             const now = new Date();
 
             eventsData.forEach(event => {
                 try {
-                    // Создаем объект Date из строк даты и времени
                     const [year, month, day] = event.date.split('-');
                     const [hours, minutes] = event.time.split(':');
 
@@ -67,9 +87,8 @@ const Calendar = () => {
                         parseInt(minutes)
                     );
 
-                    const timeDiff = (eventDateTime - now) / (1000 * 60); // разница в минутах
+                    const timeDiff = (eventDateTime - now) / (1000 * 60);
 
-                    // Если до события осталось 5 минут
                     if (timeDiff > 0 && timeDiff <= 5) {
                         const notificationKey = `notified_${event._id}`;
 
@@ -86,8 +105,6 @@ const Calendar = () => {
                             });
 
                             localStorage.setItem(notificationKey, 'true');
-
-                            // Удаляем флаг уведомления через 1 час после начала события
                             setTimeout(() => {
                                 localStorage.removeItem(notificationKey);
                             }, 60 * 60 * 1000);
@@ -100,9 +117,7 @@ const Calendar = () => {
         };
 
         const interval = setInterval(checkUpcomingEvents, 60000);
-
         checkUpcomingEvents();
-
         return () => clearInterval(interval);
     }, [eventsData]);
 
@@ -239,7 +254,7 @@ const Calendar = () => {
                     <div className="calendar-page-content-header">
                         <div className="calendar-search-container">
                             <div className="input-icon-container">
-                                <img src={search} alt="search" />
+                                <img src={search} alt="Поиск" title="Поиск мероприятий" />
                             </div>
                             <input
                                 type="text"
@@ -260,12 +275,16 @@ const Calendar = () => {
                         {currentEvents.map((event) => (
                             <div className="events-item" key={event._id}>
                                 <div className="events-item-image-container">
-                                    <img src={eventImages[event.image]} alt="" />
+                                    <img
+                                        src={eventImages[event.image]}
+                                        alt={event.title}
+                                        title={eventImageTitles[event.image] || event.title}
+                                    />
                                 </div>
                                 <div className="events-item-title">{event.title}</div>
                                 <div className="events-item-date-container">
                                     <div>
-                                        <img src={clock} alt="" />
+                                        <img src={clock} alt="Время" title="Время мероприятия" />
                                     </div>
                                     <div><p>{event.date} в {event.time}</p></div>
                                 </div>
@@ -273,19 +292,22 @@ const Calendar = () => {
                                     <div
                                         className="events-item-button"
                                         onClick={() => handleViewClick(event)}
+                                        title="Подробнее о мероприятии"
                                     >
                                         Подробнее
                                     </div>
                                     <img
                                         src={edit}
-                                        alt="edit-icon"
+                                        alt="Редактировать"
                                         className="edit-button"
                                         onClick={() => handleEditClick(event)}
+                                        title="Редактировать мероприятие"
                                     />
                                     <img
                                         src={delete_}
-                                        alt="delete-icon"
+                                        alt="Удалить"
                                         onClick={() => handleDeleteClick(event)}
+                                        title="Удалить мероприятие"
                                     />
                                 </div>
                             </div>
@@ -298,6 +320,7 @@ const Calendar = () => {
                         selectedEvent={selectedEvent}
                         onSave={handleSaveEdit}
                         eventImages={eventImages}
+                        eventImageTitles={eventImageTitles}
                         onChange={setSelectedEvent}
                     />
 
@@ -313,6 +336,7 @@ const Calendar = () => {
                         onClose={() => setViewModalOpen(false)}
                         selectedEvent={selectedEvent}
                         eventImages={eventImages}
+                        eventImageTitles={eventImageTitles}
                     />
 
                     <AddModal
@@ -322,10 +346,11 @@ const Calendar = () => {
                         onChange={setNewEvent}
                         onSave={handleSaveNewEvent}
                         eventImages={eventImages}
+                        eventImageTitles={eventImageTitles}
                     />
 
                     <div className="calendar-page-content-footer">
-                        <div className="add-btn" onClick={handleAddClick}>
+                        <div className="add-btn" onClick={handleAddClick} title="Добавить новое мероприятие">
                             <MdEventAvailable size={30} />
                             Добавить
                         </div>
