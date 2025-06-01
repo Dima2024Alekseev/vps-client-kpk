@@ -21,16 +21,30 @@
     flex-direction: column;
 }
 
+.modal-content textarea {
+    resize: vertical;
+}
+
+.panel-search-select{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.position-button{
+    display: flex;
+}
+
 .teacher-page-body-header,
 .table-container,
 .pagination-container {
     margin-bottom: 20px;
 }
 
-.teacher-page-body-header {
+.position-button{
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
 }
 
 .calendar-search-container,
@@ -53,6 +67,26 @@
     display: flex;
     align-items: center;
     border: none;
+}
+
+.add-btn-department {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background-color: #0052A2;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.add-btn-department:disabled {
+    background-color: #bdbdbd;
+    cursor: not-allowed;
 }
 
 .input-icon-container {

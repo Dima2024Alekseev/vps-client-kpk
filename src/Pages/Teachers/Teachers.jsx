@@ -1,3 +1,4 @@
+// src/Pages/Teachers/Teachers.js
 import React, { useState, useEffect } from "react";
 import "./teachers-page.css";
 import { Helmet } from "react-helmet";
@@ -12,6 +13,8 @@ import Pagination from "../../Components/Pagination";
 import ExcelExporter from "../../utils/ExcelExporter";
 import { FaFileExcel, FaUserPlus } from 'react-icons/fa';
 import { GrDocumentExcel } from "react-icons/gr";
+import { MdGroupAdd } from "react-icons/md";
+import AddDepartmentModal from "../../Components/Teachers/AddDepartmentModal";
 
 const Teachers = () => {
     const [departments, setDepartments] = useState([]);
@@ -19,11 +22,16 @@ const Teachers = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isAddDepartmentModalOpen, setIsAddDepartmentModalOpen] = useState(false);
     const [newTeacher, setNewTeacher] = useState({
         lastName: "",
         firstName: "",
         middleName: "",
         department: "",
+    });
+    const [newDepartment, setNewDepartment] = useState({
+        name: "",
+        description: "",
     });
     const [teachers, setTeachers] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -161,6 +169,42 @@ const Teachers = () => {
         }
     };
 
+    const handleNewDepartmentChange = (e) => {
+        const { name, value } = e.target;
+        setNewDepartment(prev => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSaveNewDepartment = async () => {
+        try {
+            const response = await fetch("/api/departments", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newDepartment),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Ошибка при добавлении ПЦК");
+            }
+
+            const addedDepartment = await response.json();
+            setDepartments(prev => [...prev, addedDepartment]);
+            setIsAddDepartmentModalOpen(false);
+            setNewDepartment({
+                name: "",
+                description: "",
+            });
+        } catch (err) {
+            console.error("Ошибка при добавлении ПЦК:", err);
+            alert(err.message);
+        }
+    };
+
     const handleEditTeacher = (teacher) => {
         setSelectedTeacher(teacher);
         setIsEditModalOpen(true);
@@ -233,17 +277,14 @@ const Teachers = () => {
 
     const exportTeacher = async (teacher) => {
         try {
-            // Загружаем все мероприятия
             const response = await fetch('/api/events?populate=teachers');
             if (!response.ok) throw new Error("Ошибка при загрузке мероприятий");
             const allEvents = await response.json();
 
-            // Фильтруем мероприятия для текущего преподавателя
             const teacherEvents = allEvents.filter(event =>
                 event.teachers.some(t => t._id === teacher._id)
             );
 
-            // Вызываем экспорт
             await ExcelExporter.exportTeacherDetails(teacher, teacherEvents);
         } catch (err) {
             console.error("Ошибка при экспорте преподавателя:", err);
@@ -261,34 +302,42 @@ const Teachers = () => {
                 <div className="teacher-page-content">
                     <div className="teacher-page-body">
                         <div className="teacher-page-body-header">
-                            <div className="calendar-search-container">
-                                <div className="input-icon-container">
-                                    <img src={search} alt="search" />
+                            <div className="panel-search-select">
+                                <div className="calendar-search-container">
+                                    <div className="input-icon-container">
+                                        <img src={search} alt="search" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        className="calendar-search-input"
+                                        placeholder="Поиск"
+                                        value={searchQuery}
+                                        onChange={handleSearchChange}
+                                    />
                                 </div>
-                                <input
-                                    type="text"
-                                    className="calendar-search-input"
-                                    placeholder="Поиск"
-                                    value={searchQuery}
-                                    onChange={handleSearchChange}
-                                />
+                                <div className="select-and-btn">
+                                    <select
+                                        className="select"
+                                        value={selectedDepartment}
+                                        onChange={handleDepartmentChange}
+                                    >
+                                        <option value="">Все ПЦК</option>
+                                        {departments.map((department) => (
+                                            <option key={department._id} value={department._id}>
+                                                {department.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
-                            <div className="select-and-btn">
-                                <select
-                                    className="select"
-                                    value={selectedDepartment}
-                                    onChange={handleDepartmentChange}
-                                >
-                                    <option value="">Все ПЦК</option>
-                                    {departments.map((department) => (
-                                        <option key={department._id} value={department._id}>
-                                            {department.name}
-                                        </option>
-                                    ))}
-                                </select>
+                            <div className="position-button">
                                 <button className="add-btn-teacher" onClick={() => setIsAddModalOpen(true)}>
                                     <FaUserPlus className="add-icon" />
-                                    Добавить
+                                    Добавить преподавателя
+                                </button>
+                                <button className="add-btn-department" onClick={() => setIsAddDepartmentModalOpen(true)}>
+                                    <MdGroupAdd className="add-icon" />
+                                    Добавить ПЦК
                                 </button>
                                 <button
                                     className="export-btn"
@@ -299,6 +348,7 @@ const Teachers = () => {
                                     <FaFileExcel className="excel-icon" /> Экспорт
                                 </button>
                             </div>
+
                         </div>
                         <div className="table-container">
                             <table>
@@ -352,7 +402,6 @@ const Teachers = () => {
                                                     >
                                                         <img src={delete_} alt="Удалить" className="action-icon" />
                                                     </button>
-
                                                 </td>
                                             </tr>
                                         ))
@@ -402,6 +451,14 @@ const Teachers = () => {
                             onChange={handleNewTeacherChange}
                             onSave={handleSaveNewTeacher}
                             departments={departments}
+                        />
+
+                        <AddDepartmentModal
+                            isOpen={isAddDepartmentModalOpen}
+                            onClose={() => setIsAddDepartmentModalOpen(false)}
+                            newDepartment={newDepartment}
+                            onChange={handleNewDepartmentChange}
+                            onSave={handleSaveNewDepartment}
                         />
                     </div>
                 </div>

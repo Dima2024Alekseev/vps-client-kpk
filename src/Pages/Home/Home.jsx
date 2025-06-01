@@ -10,7 +10,7 @@ import concert from "../../img/online_concert_interaction.svg";
 import events from "../../img/calendar_event_star.svg";
 import china from "../../img/china_flag_icon.svg";
 import bell from "../../img/bell-icon.svg";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { EventsContext } from "../../Components/EventsContext";
 import ViewModal from "../../Components/Calendar/ViewModal";
 import { toast } from "react-toastify";
@@ -29,6 +29,8 @@ const Home = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [directions, setDirections] = useState([]);
+  const [departments, setDepartments] = useState([]);
 
   const eventImages = {
     "reshot-icon-student.svg": reshot,
@@ -37,7 +39,6 @@ const Home = () => {
     "china_flag_icon.svg": china,
   };
 
-  // Загрузка данных при монтировании
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
@@ -59,15 +60,37 @@ const Home = () => {
       }
     };
 
+    const fetchDirections = async () => {
+      try {
+        const response = await fetch("/api/directions");
+        if (!response.ok) throw new Error("Ошибка при загрузке направлений");
+        const data = await response.json();
+        setDirections(data);
+      } catch (error) {
+        console.error("Ошибка:", error);
+      }
+    };
+
+    const fetchDepartments = async () => {
+      try {
+        const response = await fetch("/api/directions");
+        if (!response.ok) throw new Error("Ошибка при загрузке отделений");
+        const data = await response.json();
+        setDepartments(data);
+      } catch (error) {
+        console.error("Ошибка:", error);
+      }
+    };
+
     fetchDailyQuote();
+    fetchDirections();
+    fetchDepartments();
   }, []);
 
-  // Сохранение уведомлений при изменении
   useEffect(() => {
     localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
   }, [notifications]);
 
-  // Проверка предстоящих мероприятий
   useEffect(() => {
     const checkUpcomingEvents = () => {
       const now = new Date();
@@ -129,7 +152,6 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [eventsData, notifications]);
 
-  // Подсчет событий
   const countEvents = useCallback(() => {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -161,7 +183,6 @@ const Home = () => {
     countEvents();
   }, [countEvents]);
 
-  // Обработчики событий
   const handleViewClick = (event) => {
     setSelectedEvent(event);
     setViewModalOpen(true);
@@ -175,7 +196,68 @@ const Home = () => {
     setSelectedDepartment(e.target.value);
   };
 
-  // Компонент выпадающего списка уведомлений
+  const prepareChartData = () => {
+    const eventsByDirection = eventsData.reduce((acc, event) => {
+      const directionsInEvent = new Set();
+
+      event.students?.forEach(student => {
+        if (student.specialty) {
+          const direction = directions.find(d => d._id === student.specialty);
+          if (direction) {
+            directionsInEvent.add(direction.name);
+          }
+        }
+      });
+
+      event.teachers?.forEach(teacher => {
+        if (teacher.specialty) {
+          const direction = directions.find(d => d._id === teacher.specialty);
+          if (direction) {
+            directionsInEvent.add(direction.name);
+          }
+        }
+      });
+
+      if (directionsInEvent.size === 0) {
+        directionsInEvent.add("Не указано");
+      }
+
+      directionsInEvent.forEach(directionName => {
+        if (!acc[directionName]) {
+          acc[directionName] = {
+            direction: directionName,
+            events: 0,
+            participants: 0
+          };
+        }
+        acc[directionName].events += 1;
+        acc[directionName].participants += (event.students?.length || 0) + (event.teachers?.length || 0);
+      });
+
+      return acc;
+    }, {});
+
+    const filteredData = Object.values(eventsByDirection).filter(item => {
+      if (selectedDepartment === "all") return true;
+      return item.direction === selectedDepartment;
+    });
+
+    // Если нет данных, возвращаем объект с данными по умолчанию
+    if (filteredData.length === 0) {
+      return [{
+        direction: "Нет данных",
+        events: 0,
+        participants: 0
+      }];
+    }
+
+    return filteredData;
+  };
+
+
+
+  const chartData = prepareChartData();
+
   const NotificationsDropdown = () => {
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -243,17 +325,6 @@ const Home = () => {
       event.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .slice(0, 5);
-
-  const chartData = [
-    { name: "ИСиП", "Статистика активности": 8 },
-    { name: "Нач. кл.", "Статистика активности": 6 },
-    { name: "Дошкол.", "Статистика активности": 4 },
-    { name: "Физ. кул.", "Статистика активности": 2 },
-  ];
-
-  const filteredChartData = selectedDepartment === "all"
-    ? chartData
-    : chartData.filter((item) => item.name === selectedDepartment);
 
   const unreadNotificationsCount = notifications.filter(n => !n.isRead).length;
 
@@ -340,10 +411,6 @@ const Home = () => {
                 />
                 <NotificationsDropdown />
               </div>
-              {/* <div className="home-page-content-right-side-header-item">
-                  <img src={user_icon} alt="" />
-                <img src={chevron} alt="" />
-              </div> */}
             </div>
 
             <div className="home-page-cards-container">
@@ -365,26 +432,38 @@ const Home = () => {
               <div className="title">Статистика активности отделений</div>
               <select value={selectedDepartment} onChange={handleDepartmentChange}>
                 <option value="all">Все отделения</option>
-                <option value="ИСиП">ИСиП</option>
-                <option value="Нач. кл.">Нач. кл.</option>
-                <option value="Дошкол.">Дошкол.</option>
-                <option value="Физ. кул.">Физ. кул.</option>
+                {departments.map((department) => (
+                  <option key={department._id} value={department.name}>
+                    {department.name}
+                  </option>
+                ))}
               </select>
               <div className="chart-container">
-                <BarChart
-                  width={500}
-                  height={400}
-                  data={filteredChartData}
-                  margin={{ top: 10, right: -20, left: -20, bottom: 10 }}
-                >
-                  <CartesianGrid strokeDasharray="15 0" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="Статистика активности" fill="#1E3A8A" barSize={60} />
-                </BarChart>
+                {chartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <BarChart
+                      data={chartData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="direction"
+                        angle={0}
+                        textAnchor="end"
+                        height={70}
+                      />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="events" name="Количество мероприятий" fill="#0052A2" />
+                      <Bar dataKey="participants" name="Количество участников" fill="#82ca9d" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p>Нет данных для отображения</p>
+                )}
               </div>
+
             </div>
           </div>
         </div>
