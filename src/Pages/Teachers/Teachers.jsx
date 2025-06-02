@@ -1,4 +1,3 @@
-// src/Pages/Teachers/Teachers.js
 import React, { useState, useEffect } from "react";
 import "./teachers-page.css";
 import { Helmet } from "react-helmet";
@@ -14,7 +13,8 @@ import ExcelExporter from "../../utils/ExcelExporter";
 import { FaFileExcel, FaUserPlus } from 'react-icons/fa';
 import { GrDocumentExcel } from "react-icons/gr";
 import { MdGroupAdd } from "react-icons/md";
-import AddDepartmentModal from "../../Components/Teachers/AddDepartmentModal";
+import ManageDepartmentModal from "../../Components/Teachers/ManageDepartmentModal";
+import { toast } from "react-toastify";
 
 const Teachers = () => {
     const [departments, setDepartments] = useState([]);
@@ -22,16 +22,12 @@ const Teachers = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isAddDepartmentModalOpen, setIsAddDepartmentModalOpen] = useState(false);
+    const [isManageDepartmentModalOpen, setIsManageDepartmentModalOpen] = useState(false);
     const [newTeacher, setNewTeacher] = useState({
         lastName: "",
         firstName: "",
         middleName: "",
         department: "",
-    });
-    const [newDepartment, setNewDepartment] = useState({
-        name: "",
-        description: "",
     });
     const [teachers, setTeachers] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -68,6 +64,7 @@ const Teachers = () => {
                 }
             } catch (err) {
                 console.error("Ошибка при загрузке данных:", err);
+                toast.error("Ошибка при загрузке данных");
             }
         };
 
@@ -140,6 +137,13 @@ const Teachers = () => {
     };
 
     const handleSaveNewTeacher = async () => {
+        const { lastName, firstName, middleName, department } = newTeacher;
+
+        if (!lastName || !firstName || !department) {
+            toast.error("Пожалуйста, заполните все обязательные поля");
+            return;
+        }
+
         try {
             const response = await fetch("/api/teachers", {
                 method: "POST",
@@ -163,45 +167,10 @@ const Teachers = () => {
                 middleName: "",
                 department: "",
             });
+            toast.success("Преподаватель успешно добавлен");
         } catch (err) {
             console.error("Ошибка при добавлении преподавателя:", err);
-            alert(err.message);
-        }
-    };
-
-    const handleNewDepartmentChange = (e) => {
-        const { name, value } = e.target;
-        setNewDepartment(prev => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-    const handleSaveNewDepartment = async () => {
-        try {
-            const response = await fetch("/api/departments", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(newDepartment),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Ошибка при добавлении ПЦК");
-            }
-
-            const addedDepartment = await response.json();
-            setDepartments(prev => [...prev, addedDepartment]);
-            setIsAddDepartmentModalOpen(false);
-            setNewDepartment({
-                name: "",
-                description: "",
-            });
-        } catch (err) {
-            console.error("Ошибка при добавлении ПЦК:", err);
-            alert(err.message);
+            toast.error(err.message);
         }
     };
 
@@ -211,9 +180,15 @@ const Teachers = () => {
     };
 
     const handleSaveEditedTeacher = async (updatedData) => {
+        if (!updatedData._id) {
+            console.error("Идентификатор преподавателя не определен");
+            toast.error("Идентификатор преподавателя не определен");
+            return;
+        }
+
         try {
             const response = await fetch(
-                `/api/teachers/${selectedTeacher._id}`,
+                `/api/teachers/${updatedData._id}`,
                 {
                     method: "PUT",
                     headers: {
@@ -234,9 +209,10 @@ const Teachers = () => {
             );
             setIsEditModalOpen(false);
             setSelectedTeacher(null);
+            toast.success("Преподаватель успешно обновлен");
         } catch (err) {
             console.error("Ошибка при обновлении преподавателя:", err);
-            throw err;
+            toast.error(`Не удалось обновить преподавателя: ${err.message}`);
         }
     };
 
@@ -256,9 +232,71 @@ const Teachers = () => {
             }
 
             setTeachers(prev => prev.filter(t => t._id !== teacherId));
+            toast.success("Преподаватель успешно удален");
         } catch (err) {
             console.error("Ошибка при удалении преподавателя:", err);
-            alert("Не удалось удалить преподавателя");
+            toast.error("Не удалось удалить преподавателя");
+        }
+    };
+
+    const handleSaveDepartment = async (departmentData) => {
+        try {
+            let response;
+            const url = departmentData._id
+                ? `/api/departments/${departmentData._id}`
+                : "/api/departments";
+
+            response = await fetch(url, {
+                method: departmentData._id ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(departmentData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Ошибка при сохранении ПЦК");
+            }
+
+            const result = await response.json();
+
+            if (departmentData._id) {
+                setDepartments(prev =>
+                    prev.map(d => (d._id === result._id ? result : d))
+                );
+                toast.success("ПЦК успешно обновлен");
+            } else {
+                setDepartments(prev => [...prev, result]);
+                toast.success("ПЦК успешно добавлен");
+            }
+
+            return result;
+        } catch (err) {
+            console.error("Ошибка при сохранении ПЦК:", err);
+            toast.error(err.message || "Ошибка при сохранении ПЦК");
+            throw err;
+        }
+    };
+
+    const handleDeleteDepartment = async (departmentId) => {
+        if (!window.confirm("Вы уверены, что хотите удалить этот ПЦК?")) return;
+
+        try {
+            const response = await fetch(`/api/departments/${departmentId}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Ошибка при удалении ПЦК");
+            }
+
+            setDepartments(prev => prev.filter(d => d._id !== departmentId));
+            toast.success("ПЦК успешно удален");
+        } catch (err) {
+            console.error("Ошибка при удалении ПЦК:", err.message);
+            toast.error(`Не удалось удалить ПЦК: ${err.message}`);
         }
     };
 
@@ -269,9 +307,10 @@ const Teachers = () => {
                 departments,
                 selectedDepartment
             );
+            toast.success("Экспорт в Excel выполнен успешно");
         } catch (err) {
             console.error('Ошибка при экспорте в Excel:', err);
-            alert('Не удалось выполнить экспорт');
+            toast.error('Не удалось выполнить экспорт');
         }
     };
 
@@ -286,9 +325,10 @@ const Teachers = () => {
             );
 
             await ExcelExporter.exportTeacherDetails(teacher, teacherEvents);
+            toast.success(`Данные преподавателя ${teacher.lastName} экспортированы`);
         } catch (err) {
             console.error("Ошибка при экспорте преподавателя:", err);
-            alert("Не удалось экспортировать данные преподавателя");
+            toast.error("Не удалось экспортировать данные преподавателя");
         }
     };
 
@@ -335,9 +375,12 @@ const Teachers = () => {
                                     <FaUserPlus className="add-icon" />
                                     Добавить преподавателя
                                 </button>
-                                <button className="add-btn-department" onClick={() => setIsAddDepartmentModalOpen(true)}>
+                                <button
+                                    className="add-btn-department"
+                                    onClick={() => setIsManageDepartmentModalOpen(true)}
+                                >
                                     <MdGroupAdd className="add-icon" />
-                                    Добавить ПЦК
+                                    Управление ПЦК
                                 </button>
                                 <button
                                     className="export-btn"
@@ -348,7 +391,6 @@ const Teachers = () => {
                                     <FaFileExcel className="excel-icon" /> Экспорт
                                 </button>
                             </div>
-
                         </div>
                         <div className="table-container">
                             <table>
@@ -373,14 +415,21 @@ const Teachers = () => {
                                     {currentTeachers.length > 0 ? (
                                         currentTeachers.map((teacher) => (
                                             <tr key={teacher._id} className="teacher-row">
-                                                <td className="teacher-cell" onClick={() => handleTeacherClick(teacher)}>
+                                                <td
+                                                    className="teacher-cell"
+                                                    onClick={() => handleTeacherClick(teacher)}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
                                                     {teacher.lastName} {teacher.firstName} {teacher.middleName}
                                                 </td>
                                                 <td className="department-cell">{teacher.department?.name}</td>
                                                 <td className="actions">
                                                     <button
                                                         className="icon-btn"
-                                                        onClick={() => handleEditTeacher(teacher)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleEditTeacher(teacher);
+                                                        }}
                                                         title="Редактировать"
                                                     >
                                                         <img src={edit} alt="Редактировать" className="action-icon" />
@@ -397,7 +446,10 @@ const Teachers = () => {
                                                     </button>
                                                     <button
                                                         className="icon-btn"
-                                                        onClick={() => handleDeleteTeacher(teacher._id)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteTeacher(teacher._id);
+                                                        }}
                                                         title="Удалить"
                                                     >
                                                         <img src={delete_} alt="Удалить" className="action-icon" />
@@ -453,12 +505,12 @@ const Teachers = () => {
                             departments={departments}
                         />
 
-                        <AddDepartmentModal
-                            isOpen={isAddDepartmentModalOpen}
-                            onClose={() => setIsAddDepartmentModalOpen(false)}
-                            newDepartment={newDepartment}
-                            onChange={handleNewDepartmentChange}
-                            onSave={handleSaveNewDepartment}
+                        <ManageDepartmentModal
+                            isOpen={isManageDepartmentModalOpen}
+                            onClose={() => setIsManageDepartmentModalOpen(false)}
+                            departments={departments}
+                            onSave={handleSaveDepartment}
+                            onDelete={handleDeleteDepartment}
                         />
                     </div>
                 </div>
