@@ -44,7 +44,7 @@ const Calendar = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const eventsPerPage = 5;
     const [searchQuery, setSearchQuery] = useState("");
-    const [sortType, setSortType] = useState("date");
+    const [sortType, setSortType] = useState("date-desc");
 
     const eventImages = {
         "reshot-icon-student.svg": reshot,
@@ -126,8 +126,10 @@ const Calendar = () => {
     );
 
     const sortedEvents = [...filteredEvents].sort((a, b) => {
-        if (sortType === "date") {
-            return new Date(a.date) - new Date(b.date);
+        if (sortType === "date-desc") {
+            return new Date(b.date) - new Date(a.date); // Сортировка по убыванию
+        } else if (sortType === "date-asc") {
+            return new Date(a.date) - new Date(b.date); // Сортировка по возрастанию
         } else if (sortType === "title-asc") {
             return a.title.localeCompare(b.title);
         } else if (sortType === "title-desc") {
@@ -265,7 +267,8 @@ const Calendar = () => {
                             />
                         </div>
                         <select className="calendar-select-sort" value={sortType} onChange={handleSortChange}>
-                            <option value="date">Сорт: Дата</option>
+                            <option value="date-desc">Дата - по убыванию</option>
+                            <option value="date-asc">Дата - по возрастанию</option>
                             <option value="title-asc">Сорт: Название А-Я</option>
                             <option value="title-desc">Сорт: Название Я-А</option>
                         </select>
