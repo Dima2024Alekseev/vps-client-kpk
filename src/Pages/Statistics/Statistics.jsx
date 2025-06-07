@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./statistic.css";
 import { Helmet } from "react-helmet";
 import Header from "../../Components/Header/Header";
 import Pagination from "../../Components/Pagination";
@@ -7,6 +6,66 @@ import ExcelExporter from "../../utils/ExcelExporter";
 import { FaFileExcel, FaTable, FaChartBar } from 'react-icons/fa';
 import Modal from "../../Components/ModalStatistics/ModalStatistics";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import "./statistic.css";
+
+// Улучшенный компонент модального окна для студентов
+const StudentsModal = ({ isOpen, onClose, students, groupName }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="modal-overlay">
+            <div className="modal-content students-modal">
+                <div className="modal-header">
+                    <h3>
+                        <span className="group-name-badge">{groupName}</span>
+                        <span>Список студентов</span>
+                    </h3>
+                    <button className="modal-close" onClick={onClose}>
+                        &times;
+                    </button>
+                </div>
+                <div className="modal-body">
+                    <div className="students-count">
+                        Всего студентов: <strong>{students.length}</strong>
+                    </div>
+                    {students.length > 0 ? (
+                        <div className="students-table-container">
+                            <table className="students-table">
+                                <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Фамилия</th>
+                                        <th>Имя</th>
+                                        <th>Отчество</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {students.map((student, index) => (
+                                        <tr key={student._id}>
+                                            <td>{index + 1}</td>
+                                            <td>{student.lastName}</td>
+                                            <td>{student.firstName}</td>
+                                            <td>{student.middleName || '-'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="no-students-message">
+                            <p>Нет студентов в этой группе</p>
+                        </div>
+                    )}
+                </div>
+                <div className="modal-footer">
+                    <button className="close-button" onClick={onClose}>
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const Statistics = () => {
     const [events, setEvents] = useState([]);
@@ -18,14 +77,16 @@ const Statistics = () => {
     const [specialtyFilter, setSpecialtyFilter] = useState("");
     const [departmentFilter, setDepartmentFilter] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [viewMode, setViewMode] = useState('table'); // 'table' или 'chart'
+    const [viewMode, setViewMode] = useState('table');
+    const [expandedGroups, setExpandedGroups] = useState({});
+    const [selectedGroup, setSelectedGroup] = useState(null);
     const eventsPerPage = 10;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [eventsRes, departmentsRes, directionsRes] = await Promise.all([
-                    fetch("/api/events"),
+                    fetch("/api/event-groups"),
                     fetch("/api/departments"),
                     fetch("/api/directions")
                 ]);
@@ -75,21 +136,35 @@ const Statistics = () => {
         setViewMode(viewMode === 'table' ? 'chart' : 'table');
     };
 
+    const toggleGroup = (groupId, groupName, students) => {
+        setSelectedGroup({ groupId, groupName, students });
+    };
+
+    const closeStudentsModal = () => {
+        setSelectedGroup(null);
+    };
+
     const filteredEvents = events.filter(event => {
         const searchMatch = !searchQuery ||
             event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            event.students.some(student => student.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (event.groups && event.groups.some(group =>
+                group.group.name.toLowerCase().includes(searchQuery.toLowerCase())
+            )) ||
             event.teachers.some(teacher => teacher.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
 
         const dateMatch = !dateFilter ||
             new Date(event.date).toLocaleDateString() === new Date(dateFilter).toLocaleDateString();
 
         const specialtyMatch = !specialtyFilter ||
-            event.students.some(student => student.specialty === specialtyFilter) ||
+            (event.groups && event.groups.some(group =>
+                group.students.some(student => student.specialty === specialtyFilter)
+            )) ||
             event.teachers.some(teacher => teacher.specialty === specialtyFilter);
 
         const departmentMatch = !departmentFilter ||
-            event.students.some(student => student.department === departmentFilter) ||
+            (event.groups && event.groups.some(group =>
+                group.students.some(student => student.department === departmentFilter)
+            )) ||
             event.teachers.some(teacher => teacher.department === departmentFilter);
 
         return searchMatch && dateMatch && specialtyMatch && departmentMatch;
@@ -99,13 +174,21 @@ const Statistics = () => {
         if (dateFilter) {
             return new Date(a.date) - new Date(b.date);
         } else if (specialtyFilter) {
-            return a.students.some(student => student.specialty === specialtyFilter) ||
-                a.teachers.some(teacher => teacher.specialty === specialtyFilter)
-                ? -1 : 1;
+            const aHasSpecialty = a.groups && a.groups.some(group =>
+                group.students.some(student => student.specialty === specialtyFilter)
+            );
+            const bHasSpecialty = b.groups && b.groups.some(group =>
+                group.students.some(student => student.specialty === specialtyFilter)
+            );
+            return aHasSpecialty ? -1 : bHasSpecialty ? 1 : 0;
         } else if (departmentFilter) {
-            return a.students.some(student => student.department === departmentFilter) ||
-                a.teachers.some(teacher => teacher.department === departmentFilter)
-                ? -1 : 1;
+            const aHasDepartment = a.groups && a.groups.some(group =>
+                group.students.some(student => student.department === departmentFilter)
+            );
+            const bHasDepartment = b.groups && b.groups.some(group =>
+                group.students.some(student => student.department === departmentFilter)
+            );
+            return aHasDepartment ? -1 : bHasDepartment ? 1 : 0;
         }
         return 0;
     });
@@ -159,9 +242,7 @@ const Statistics = () => {
         }
     };
 
-    // Подготовка данных для диаграммы
     const prepareChartData = () => {
-        // Группировка по датам
         const eventsByDate = filteredEvents.reduce((acc, event) => {
             const date = new Date(event.date).toLocaleDateString();
             if (!acc[date]) {
@@ -172,25 +253,30 @@ const Statistics = () => {
                 };
             }
             acc[date].events += 1;
-            acc[date].participants += (event.students?.length || 0) + (event.teachers?.length || 0);
+
+            const studentsCount = event.groups ?
+                event.groups.reduce((sum, group) => sum + group.students.length, 0) : 0;
+            acc[date].participants += studentsCount + (event.teachers?.length || 0);
+
             return acc;
         }, {});
 
-        // Группировка по направлениям
         const eventsByDirection = filteredEvents.reduce((acc, event) => {
             const directionsInEvent = new Set();
 
-            // Собираем все направления студентов
-            event.students?.forEach(student => {
-                if (student.specialty) {
-                    const direction = directions.find(d => d._id === student.specialty);
-                    if (direction) {
-                        directionsInEvent.add(direction.name);
-                    }
-                }
-            });
+            if (event.groups) {
+                event.groups.forEach(group => {
+                    group.students.forEach(student => {
+                        if (student.specialty) {
+                            const direction = directions.find(d => d._id === student.specialty);
+                            if (direction) {
+                                directionsInEvent.add(direction.name);
+                            }
+                        }
+                    });
+                });
+            }
 
-            // Собираем все направления преподавателей
             event.teachers?.forEach(teacher => {
                 if (teacher.specialty) {
                     const direction = directions.find(d => d._id === teacher.specialty);
@@ -200,12 +286,10 @@ const Statistics = () => {
                 }
             });
 
-            // Если нет направлений, добавляем "Не указано"
             if (directionsInEvent.size === 0) {
                 directionsInEvent.add("Не указано");
             }
 
-            // Увеличиваем счетчики для каждого направления
             directionsInEvent.forEach(directionName => {
                 if (!acc[directionName]) {
                     acc[directionName] = {
@@ -215,7 +299,32 @@ const Statistics = () => {
                     };
                 }
                 acc[directionName].events += 1;
-                acc[directionName].participants += (event.students?.length || 0) + (event.teachers?.length || 0);
+
+                let directionParticipants = 0;
+
+                if (event.groups) {
+                    event.groups.forEach(group => {
+                        group.students.forEach(student => {
+                            if (student.specialty) {
+                                const direction = directions.find(d => d._id === student.specialty);
+                                if (direction && direction.name === directionName) {
+                                    directionParticipants += 1;
+                                }
+                            }
+                        });
+                    });
+                }
+
+                event.teachers?.forEach(teacher => {
+                    if (teacher.specialty) {
+                        const direction = directions.find(d => d._id === teacher.specialty);
+                        if (direction && direction.name === directionName) {
+                            directionParticipants += 1;
+                        }
+                    }
+                });
+
+                acc[directionName].participants += directionParticipants;
             });
 
             return acc;
@@ -333,15 +442,23 @@ const Statistics = () => {
                                                         <td className="event-cell">{event.title}</td>
                                                         <td className="date-cell">{new Date(event.date).toLocaleDateString()}</td>
                                                         <td className="participants-cell">
-                                                            {event.students && event.students.length > 0 ? (
-                                                                <div className="participants-list">
-                                                                    {event.students.map(student => (
-                                                                        <div key={student._id}>{student.fullName}</div>
+                                                            {event.groups && event.groups.length > 0 ? (
+                                                                <div className="groups-list">
+                                                                    {event.groups.map(group => (
+                                                                        <div key={group.group._id} className="group-item">
+                                                                            <button
+                                                                                className="group-header"
+                                                                                onClick={() => toggleGroup(group.group._id, group.group.name, group.students)}
+                                                                            >
+                                                                                <strong>Группа: {group.group.name}</strong>
+                                                                            </button>
+                                                                        </div>
                                                                     ))}
                                                                 </div>
-                                                            ) : "Нет участников"}
+                                                            ) : "Нет участников-студентов"}
                                                             {event.teachers && event.teachers.length > 0 ? (
-                                                                <div className="participants-list">
+                                                                <div className="teachers-list">
+                                                                    <strong>Преподаватели:</strong>
                                                                     {event.teachers.map(teacher => (
                                                                         <div key={teacher._id}>{teacher.fullName}</div>
                                                                     ))}
@@ -440,6 +557,12 @@ const Statistics = () => {
                 onClose={closeModal}
                 onExport={exportSelectedEvent}
                 events={events}
+            />
+            <StudentsModal
+                isOpen={!!selectedGroup}
+                onClose={closeStudentsModal}
+                students={selectedGroup ? selectedGroup.students : []}
+                groupName={selectedGroup ? selectedGroup.groupName : ''}
             />
         </>
     );

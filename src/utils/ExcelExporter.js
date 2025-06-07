@@ -567,7 +567,7 @@ const ExcelExporter = {
         const worksheet = workbook.addWorksheet('Мероприятия');
 
         // Заголовок с информацией о фильтрах
-        const filterInfo = `Мероприятия`;
+        const filterInfo = `Мероприятия${dateFilter ? ` за ${new Date(dateFilter).toLocaleDateString()}` : ''}`;
         worksheet.addRow([filterInfo]);
         worksheet.mergeCells('A1:H1');
 
@@ -580,7 +580,16 @@ const ExcelExporter = {
         });
 
         // Заголовки таблицы мероприятий
-        const eventHeaders = ['Название', 'Дата', 'Время', 'Место', 'Организатор', 'Город', 'Ответственный', 'Участники'];
+        const eventHeaders = [
+            'Название',
+            'Дата',
+            'Время',
+            'Место',
+            'Организатор',
+            'Город',
+            'Ответственный',
+            'Участники'
+        ];
         worksheet.addRow(eventHeaders);
 
         // Стиль для заголовков мероприятий
@@ -611,15 +620,43 @@ const ExcelExporter = {
 
         // Добавляем данные мероприятий
         events.forEach(event => {
-            // Форматируем участников
-            const participantsString = [
-                ...event.students.map(student => `${student.fullName} (Студент)`),
-                ...event.teachers.map(teacher => `${teacher.fullName} (Преподаватель)`)
-            ].join('\n') || 'Нет данных';
+            // Формируем список студентов
+            const studentParticipants = (event.students || []).map(student => {
+                const fullName = [
+                    student.lastName || '',
+                    student.firstName || '',
+                    student.middleName || ''
+                ].filter(Boolean).join(' ');
 
+                return `${fullName} (Студент${student.group?.name ? `, ${student.group.name}` : ''})`;
+            });
+
+            // Формируем список преподавателей
+            const teacherParticipants = (event.teachers || []).map(teacher => {
+                const fullName = [
+                    teacher.lastName || '',
+                    teacher.firstName || '',
+                    teacher.middleName || ''
+                ].filter(Boolean).join(' ');
+
+                return `${fullName} (Преподаватель${teacher.department?.name ? `, ${teacher.department.name}` : ''})`;
+            });
+
+            // Объединяем всех участников
+            const allParticipants = [...studentParticipants, ...teacherParticipants];
+            const participantsString = allParticipants.length > 0
+                ? allParticipants.join('\n')
+                : 'Нет участников';
+
+            // Форматируем дату
+            const formattedDate = event.date
+                ? new Date(event.date).toLocaleDateString()
+                : 'Нет данных';
+
+            // Добавляем строку с данными мероприятия
             const eventRow = worksheet.addRow([
                 event.title || 'Нет данных',
-                event.date || 'Нет данных',
+                formattedDate,
                 event.time || 'Нет данных',
                 event.place || 'Нет данных',
                 event.organizer || 'Нет данных',
@@ -630,7 +667,11 @@ const ExcelExporter = {
 
             // Стиль для данных мероприятий
             eventRow.eachCell((cell) => {
-                cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                cell.alignment = {
+                    vertical: 'middle',
+                    horizontal: 'center',
+                    wrapText: true
+                };
                 cell.border = {
                     top: { style: 'thin' },
                     left: { style: 'thin' },
@@ -641,7 +682,7 @@ const ExcelExporter = {
         });
 
         // Генерация и скачивание файла
-        const fileName = `Мероприятия_${new Date().toLocaleDateString()}.xlsx`;
+        const fileName = `Мероприятия_${dateFilter ? new Date(dateFilter).toLocaleDateString() + '_' : ''}${new Date().toLocaleDateString()}.xlsx`;
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const link = document.createElement('a');

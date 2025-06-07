@@ -253,6 +253,183 @@ tr:hover td {
   height: 400px;
 }
 
+/* Стили для модального окна студентов */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+
+
+.modal-content.students-modal {
+  max-width: 800px;
+  width: 95%;
+  padding: 25px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.students-modal .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 20px;
+}
+
+.students-modal .modal-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.group-name-badge {
+  background-color: #0052A2;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.students-count {
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.students-table-container {
+  max-height: 60vh;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.students-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.students-table th {
+  background-color: #f5f7fa;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #444;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.students-table td {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.students-table tr:last-child td {
+  border-bottom: none;
+}
+
+.students-table tr:hover td {
+  background-color: #f8fafc;
+}
+
+.no-students-message {
+  text-align: center;
+  padding: 30px;
+  color: #777;
+  font-style: italic;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.close-button {
+  padding: 8px 20px;
+  background-color: #0052A2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background-color: #003d7a;
+}
+
+.group-header {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 5px 0;
+  cursor: pointer;
+  color: #0052A2;
+  font-weight: 600;
+}
+
+.group-header:hover {
+  text-decoration: underline;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .students-modal {
+    padding: 15px;
+  }
+
+  .students-table th,
+  .students-table td {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .students-modal .modal-header h3 {
+    font-size: 1.1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .group-name-badge {
+    font-size: 0.8rem;
+  }
+}
+
 /* Адаптивность */
 @media (max-width: 1200px) {
   .statistic-page {
